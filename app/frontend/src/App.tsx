@@ -1,8 +1,9 @@
 import { useState } from "react";
 import CallsView from "./components/CallsView";
 import Dashboard from "./components/Dashboard";
+import GenieView from "./components/GenieView";
 
-type Tab = "calls" | "dashboard";
+type Tab = "calls" | "dashboard" | "genie";
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("calls");
@@ -31,12 +32,20 @@ export default function App() {
           >
             Dashboard
           </button>
+          <button
+            className={`tab ${tab === "genie" ? "active" : ""}`}
+            onClick={() => setTab("genie")}
+          >
+            Ask Genie
+          </button>
         </nav>
         <div className="spacer" />
         <div className="env">Internal tool · synthetic data</div>
       </header>
 
-      {tab === "calls" ? <CallsView /> : <Dashboard />}
+      {tab === "calls" && <CallsView />}
+      {tab === "dashboard" && <Dashboard />}
+      {tab === "genie" && <GenieView />}
     </>
   );
 }

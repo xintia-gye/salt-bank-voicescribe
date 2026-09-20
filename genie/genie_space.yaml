@@ -1,9 +1,11 @@
 # Salt Bank VoiceScribe — Genie Space (Layer 5)
 #
+# LIVE on the bolt workspace:
+#   space_id: 01f1b52b26c11cacb12269806671aa8e
+#   Integrated into the app's "Ask Genie" tab via the Genie Conversation API.
+#
 # Genie provides natural-language analytics over the Gold call-summary table.
-# The Gold table is created and populated by notebooks 01 & 03 and is fully
-# query-ready. Create the space in the workspace UI (Genie → New space) using
-# the config below, or via the Genie API once serialized_space is available.
+# This YAML documents the space config; the space itself is already created.
 
 display_name: "Salt Bank VoiceScribe — Call Analytics"
 description: >

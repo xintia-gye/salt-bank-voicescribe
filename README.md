@@ -83,8 +83,11 @@ Built and verified on the Databricks workspace `adb-984752964297111`, catalog
 | 3 · ML (Whisper STT) | ✅ live | 40 transcripts in Silver |
 | 4 · GenAI agent (Claude) | ✅ live | `ai_query` over all 40 → Gold; **100% category accuracy**; `create_ticket` UC function |
 | 2 · Lakebase | ✅ live | `voicescribe-oltp` (PG 16), 40 rows in `call_summaries` |
-| 5 · Genie | ✅ config + validated queries | NL analytics over Gold |
-| 6 · App + Twilio | ✅ deploy-ready | FastAPI + React; synthetic + Twilio adapters; run via `app/run_local.sh` |
+| 5 · Genie | ✅ live | Space `01f1b52b26c11cacb12269806671aa8e`; conversational NL analytics, in the app's "Ask Genie" tab |
+| 6 · App + Twilio | ✅ deployed & running | FastAPI + React; Calls / Dashboard / Ask Genie tabs; synthetic + Twilio adapters |
+
+**Live app:** https://voicescribe-984752964297111.11.azure.databricksapps.com (Databricks SSO).
+Run locally instead via `app/run_local.sh`.
 
 See [docs/DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md) for the recording flow and evidence checklist.
 

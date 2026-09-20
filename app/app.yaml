@@ -19,15 +19,20 @@ command:
   - "8000"
 
 env:
-  # Resolves to the id of the SQL warehouse resource named "sql-warehouse".
+  # SQL warehouse to query. The warehouse id is not a secret, so it is set
+  # directly here for a self-contained deploy. Alternatively attach a
+  # "sql-warehouse" app resource and use `valueFrom: sql-warehouse`.
   - name: DATABRICKS_WAREHOUSE_ID
-    valueFrom: sql-warehouse
+    value: "148ccb90800933a1"
   - name: DATABRICKS_CATALOG
     value: salt_bank_voicescribe
   - name: DATABRICKS_SCHEMA
     value: voicescribe
   - name: INGEST_ADAPTER
     value: synthetic
+  # Genie space (Layer 5) for supervisor natural-language analytics.
+  - name: GENIE_SPACE_ID
+    value: "01f1b52b26c11cacb12269806671aa8e"
   # When you provision Twilio, set INGEST_ADAPTER=twilio and add TWILIO_AUTH_TOKEN
   # as a secret-backed resource, e.g.:
   # - name: TWILIO_AUTH_TOKEN

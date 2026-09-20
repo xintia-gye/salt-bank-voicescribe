@@ -22,7 +22,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import db
+from . import db, genie
 from .config import get_settings
 from .ingest import get_adapter
 
@@ -45,6 +45,11 @@ class ApproveRequest(BaseModel):
     action: str = "approve"          # "approve" | "edit"
     edited_summary: str | None = None
     approved_by: str | None = None
+
+
+class GenieRequest(BaseModel):
+    question: str
+    conversation_id: str | None = None
 
 
 # --------------------------------------------------------------------------
@@ -118,6 +123,29 @@ def stats():
         raise HTTPException(status_code=502, detail=f"warehouse error: {exc}") from exc
 
 
+@app.get("/api/genie/info")
+def genie_info():
+    return {
+        "space_id": genie.get_space_id(),
+        "sample_questions": [
+            "How many calls did we have by category?",
+            "What is the average call duration by agent, in minutes?",
+            "Show the share of negative-sentiment calls by language.",
+            "Which agent handled the most account closure calls?",
+        ],
+    }
+
+
+@app.post("/api/genie/ask")
+def genie_ask(body: GenieRequest):
+    if not body.question.strip():
+        raise HTTPException(status_code=400, detail="question is required")
+    try:
+        return genie.ask(body.question, body.conversation_id)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=502, detail=f"genie error: {exc}") from exc
+
+
 @app.post("/api/ingest/twilio")
 async def ingest_twilio(request: Request):
     """Accept a Twilio recording webhook (twilio mode) or replay a synthetic
@@ -186,11 +214,12 @@ def _insert_bronze(payload) -> None:
 _FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 
 if _FRONTEND_DIST.exists():
-    app.mount(
-        "/assets",
-        StaticFiles(directory=_FRONTEND_DIST / "assets"),
-        name="assets",
-    )
+    if (_FRONTEND_DIST / "assets").is_dir():
+        app.mount(
+            "/assets",
+            StaticFiles(directory=_FRONTEND_DIST / "assets"),
+            name="assets",
+        )
 
     @app.get("/{full_path:path}")
     def serve_spa(full_path: str):
