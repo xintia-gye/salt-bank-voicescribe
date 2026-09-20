@@ -1,0 +1,8 @@
+AGENT: Salt Bank, bună ziua, cu ce vă pot ajuta?
+CUSTOMER: Bună, mi-am pierdut cardul ieri și vreau să îl blochez.
+AGENT: Îmi pare rău. Îl blochez imediat. Îmi confirmați numele și data nașterii?
+CUSTOMER: Da, sunt Ana M., născut pe 14 martie.
+AGENT: Mulțumesc. Cardul care se termină în 4471 este acum blocat. Doriți un card nou?
+CUSTOMER: Da, vă rog, la adresa de domiciliu.
+AGENT: Gata. Ajunge în 3-5 zile lucrătoare. Mai pot ajuta cu ceva?
+CUSTOMER: Nu, mulțumesc frumos.

@@ -1,0 +1,8 @@
+AGENT: Bună dimineața, Salt Bank.
+CUSTOMER: Aș vrea să știu dacă mă calific pentru un credit de 10.000 de euro.
+AGENT: Pot face o verificare preliminară. Care e scopul și venitul lunar?
+CUSTOMER: Renovarea casei, câștig aproximativ 2.500 pe lună.
+AGENT: Pe baza asta probabil vă calificați. Trimit o pre-ofertă în aplicație.
+CUSTOMER: Aproximativ ce dobândă?
+AGENT: Orientativ în jur de 8,9% DAE, sub rezerva evaluării complete.
+CUSTOMER: Perfect, o verific în aplicație.

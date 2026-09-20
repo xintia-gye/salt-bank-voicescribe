@@ -1,0 +1,8 @@
+AGENT: Good morning, Salt Bank.
+CUSTOMER: I'd like to know if I qualify for a personal loan of 10,000 euros.
+AGENT: I can do a soft check. What's the purpose and your monthly income?
+CUSTOMER: Home renovation, and I earn about 2,500 a month.
+AGENT: Based on that you'd likely qualify. I'll send a pre-offer to your app.
+CUSTOMER: What interest rate roughly?
+AGENT: Indicatively around 8.9% APR, subject to full assessment.
+CUSTOMER: Great, I'll review it in the app.

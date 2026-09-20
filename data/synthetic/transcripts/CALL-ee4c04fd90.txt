@@ -1,0 +1,8 @@
+AGENT: Salt Bank, how may I assist?
+CUSTOMER: I want to close my account, I'm switching banks.
+AGENT: I'm sorry to hear that. May I ask the reason?
+CUSTOMER: Too many fees on transfers.
+AGENT: Understood. I can waive next month's fees if you'd like to stay.
+CUSTOMER: No, I've decided. Please proceed.
+AGENT: I'll start the closure and transfer the balance to your listed IBAN.
+CUSTOMER: Thank you.

@@ -1,0 +1,8 @@
+AGENT: Salt Bank, how can I help you today?
+CUSTOMER: There are two payments I didn't make, to some website, 120 euros each.
+AGENT: Let's check that. I see two transactions last night flagged as unusual.
+CUSTOMER: I never authorized those. I want my money back.
+AGENT: I'm opening a fraud dispute now and blocking the card as a precaution.
+CUSTOMER: How long does the refund take?
+AGENT: Provisional credit within 2 days, final decision within 10. You'll get an SMS.
+CUSTOMER: Okay, thanks.

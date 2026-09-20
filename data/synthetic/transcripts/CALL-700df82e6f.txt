@@ -1,0 +1,8 @@
+AGENT: Salt Bank suport, cu ce vă ajut?
+CUSTOMER: Aplicația nu mă lasă să mă loghez, îmi dă eroarea 403.
+AGENT: Rezolvăm. Ați actualizat la ultima versiune?
+CUSTOMER: Cred că da, dar tot nu merge.
+AGENT: Reinstalați aplicația și logați-vă cu numărul de telefon; resetez sesiunea.
+CUSTOMER: Bine... da, acum funcționează.
+AGENT: Perfect. Notez ca problemă tehnică rezolvată.
+CUSTOMER: Mulțumesc pentru ajutorul rapid.

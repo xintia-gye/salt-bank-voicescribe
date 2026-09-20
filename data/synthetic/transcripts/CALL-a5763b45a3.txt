@@ -1,0 +1,8 @@
+AGENT: Salt Bank, cu ce vă pot ajuta?
+CUSTOMER: Vreau să îmi închid contul, schimb banca.
+AGENT: Îmi pare rău. Pot întreba motivul?
+CUSTOMER: Prea multe comisioane la transferuri.
+AGENT: Înțeleg. Pot anula comisioanele lunii viitoare dacă doriți să rămâneți.
+CUSTOMER: Nu, m-am decis. Vă rog continuați.
+AGENT: Încep închiderea și transfer soldul către IBAN-ul înregistrat.
+CUSTOMER: Mulțumesc.

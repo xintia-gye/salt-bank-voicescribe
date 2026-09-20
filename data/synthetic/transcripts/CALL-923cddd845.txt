@@ -1,0 +1,8 @@
+AGENT: Salt Bank support, how can I help?
+CUSTOMER: The app won't let me log in, it says error 403.
+AGENT: Let's fix that. Have you updated to the latest version?
+CUSTOMER: I think so, but it still fails.
+AGENT: Please reinstall the app and log in with your phone number; I'll reset the session.
+CUSTOMER: Okay... yes, it works now.
+AGENT: Great. I'll log this as a resolved technical issue.
+CUSTOMER: Thanks for the quick help.

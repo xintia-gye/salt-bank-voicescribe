@@ -1,0 +1,8 @@
+AGENT: Salt Bank, cu ce vă pot ajuta astăzi?
+CUSTOMER: Sunt două plăți pe care nu le-am făcut, către un site, câte 120 de euro.
+AGENT: Verific imediat. Văd două tranzacții de aseară marcate ca neobișnuite.
+CUSTOMER: Nu le-am autorizat. Vreau banii înapoi.
+AGENT: Deschid acum o sesizare de fraudă și blochez cardul din precauție.
+CUSTOMER: Cât durează rambursarea?
+AGENT: Credit provizoriu în 2 zile, decizie finală în 10. Veți primi un SMS.
+CUSTOMER: Bine, mulțumesc.

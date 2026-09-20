@@ -1,0 +1,8 @@
+AGENT: Salt Bank, good afternoon, how can I help?
+CUSTOMER: Hi, I lost my card yesterday and I want to block it.
+AGENT: I'm sorry to hear that. I can block it right now. Can you confirm your name and date of birth?
+CUSTOMER: Yes, it's Larisa N., born on the 14th of March.
+AGENT: Thank you. Your card ending 4471 is now blocked. Shall I order a replacement?
+CUSTOMER: Yes please, to my home address.
+AGENT: Done. It arrives in 3 to 5 working days. Anything else?
+CUSTOMER: No, thank you very much.
