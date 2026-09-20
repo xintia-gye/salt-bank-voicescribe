@@ -1,0 +1,34 @@
+# Databricks App config for Salt Bank VoiceScribe.
+#
+# The FastAPI backend serves both the REST API (/api/*) and the built React
+# SPA (frontend/dist). Uvicorn binds to the port Databricks injects via $PORT
+# (falls back to 8000 locally).
+#
+# DATABRICKS_HOST and the service-principal OAuth creds
+# (DATABRICKS_CLIENT_ID / DATABRICKS_CLIENT_SECRET) are injected automatically
+# by the Apps runtime, so they are NOT listed here. The SQL warehouse id is
+# provided via the `sql-warehouse` app resource (add it in the App UI /
+# bundle and it is exposed as DATABRICKS_WAREHOUSE_ID).
+
+command:
+  - uvicorn
+  - backend.main:app
+  - --host
+  - 0.0.0.0
+  - --port
+  - "8000"
+
+env:
+  # Resolves to the id of the SQL warehouse resource named "sql-warehouse".
+  - name: DATABRICKS_WAREHOUSE_ID
+    valueFrom: sql-warehouse
+  - name: DATABRICKS_CATALOG
+    value: salt_bank_voicescribe
+  - name: DATABRICKS_SCHEMA
+    value: voicescribe
+  - name: INGEST_ADAPTER
+    value: synthetic
+  # When you provision Twilio, set INGEST_ADAPTER=twilio and add TWILIO_AUTH_TOKEN
+  # as a secret-backed resource, e.g.:
+  # - name: TWILIO_AUTH_TOKEN
+  #   valueFrom: twilio-auth-token
