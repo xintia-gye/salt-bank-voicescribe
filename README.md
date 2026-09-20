@@ -92,6 +92,10 @@ Built and verified on the Databricks workspace `adb-984752964297111`, catalog
 **Live app:** https://voicescribe-984752964297111.11.azure.databricksapps.com (Databricks SSO).
 Run locally instead via `app/run_local.sh`.
 
+**Governance:** Unity Catalog dynamic **column masks** protect PII on the serving
+tables — phone numbers and card/IBAN digits are masked for non-admins, enforced at
+query time across the app, Genie, and SQL (see `notebooks/06_pii_masking.sql`).
+
 See [docs/DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md) for the recording flow and evidence checklist.
 
 ## Effie submission mapping
