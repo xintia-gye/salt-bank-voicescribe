@@ -79,7 +79,7 @@ Built and verified on the Databricks workspace `adb-984752964297111`, catalog
 
 | Layer | Status | Detail |
 |-------|--------|--------|
-| 1 · Lakeflow + UC | ✅ live | Bronze/Silver/Gold + `raw_audio` volume; 40 calls (28 RO, 12 EN) |
+| 1 · Lakeflow + UC | ✅ live | **Deployed Lakeflow pipeline** `voicescribe_medallion` (serverless) runs Bronze→Silver→Gold; UC catalog + `raw_audio` volume; 40 calls (28 RO, 12 EN) |
 | 3 · ML (Whisper STT) | ✅ live | 40 transcripts in Silver |
 | 4 · GenAI agent (Claude) | ✅ live | `ai_query` over all 40 → Gold; **100% category accuracy**; `create_ticket` UC function |
 | 2 · Lakebase | ✅ live | `voicescribe-oltp` (PG 16), 40 rows in `call_summaries` |
