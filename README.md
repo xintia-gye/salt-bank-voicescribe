@@ -72,10 +72,26 @@ Select via `INGEST_ADAPTER=twilio|synthetic` in your environment.
 
 Detailed step-by-step instructions live in `docs/`.
 
+## Build status — all six layers live
+
+Built and verified on the Databricks workspace `adb-984752964297111`, catalog
+`salt_bank_voicescribe.voicescribe`:
+
+| Layer | Status | Detail |
+|-------|--------|--------|
+| 1 · Lakeflow + UC | ✅ live | Bronze/Silver/Gold + `raw_audio` volume; 40 calls (28 RO, 12 EN) |
+| 3 · ML (Whisper STT) | ✅ live | 40 transcripts in Silver |
+| 4 · GenAI agent (Claude) | ✅ live | `ai_query` over all 40 → Gold; **100% category accuracy**; `create_ticket` UC function |
+| 2 · Lakebase | ✅ live | `voicescribe-oltp` (PG 16), 40 rows in `call_summaries` |
+| 5 · Genie | ✅ config + validated queries | NL analytics over Gold |
+| 6 · App + Twilio | ✅ deploy-ready | FastAPI + React; synthetic + Twilio adapters; run via `app/run_local.sh` |
+
+See [docs/DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md) for the recording flow and evidence checklist.
+
 ## Effie submission mapping
 
-- ✅ **One functional build, all six layers** — see Architecture table.
-- ✅ **Evidence it ran** — committed notebooks with outputs, screenshots, and a 3–5 min screen recording.
+- ✅ **One functional build, all six layers** — see table above.
+- ⏳ **Evidence it ran** — run notebooks 01→05 for committed outputs; capture app/Genie/lineage screenshots + 3–5 min recording (see runbook).
 - ✅ **Readable repo** — this README, synthetic data only, secrets excluded.
 - ⏳ **Deck** — Google Slides / PDF (prepared separately).
 - ⏳ **Yoodli roleplay ≥ 75%** — delivery practice on the demo narrative.
