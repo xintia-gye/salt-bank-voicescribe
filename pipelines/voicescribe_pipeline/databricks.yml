@@ -1,0 +1,42 @@
+# Databricks Asset Bundle — Salt Bank VoiceScribe medallion pipeline
+#
+# A Lakeflow Spark Declarative Pipeline (serverless) that builds the
+# bronze -> silver -> gold medallion for VoiceScribe entirely declaratively:
+#   bronze_calls        <- Auto Loader over landing/calls  (call metadata)
+#   silver_transcripts  <- Auto Loader over landing/transcripts (STT output)
+#   gold_call_summaries <- ai_query(Claude) structured summary + UC-function ticket
+#
+# It writes to the DEDICATED schema `voicescribe_pipeline` so it does NOT
+# disturb the hand-loaded `voicescribe` schema that already serves the live
+# app + Genie. Repoint the app by setting DATABRICKS_SCHEMA=voicescribe_pipeline
+# once you are happy with the pipeline output.
+bundle:
+  name: voicescribe_pipeline
+
+variables:
+  catalog:
+    description: Unity Catalog for all layers
+    default: salt_bank_voicescribe
+  schema:
+    description: Target schema for the medallion tables
+    default: voicescribe_pipeline
+  landing_volume:
+    description: UC Volume path holding landing data
+    default: /Volumes/salt_bank_voicescribe/voicescribe_pipeline/landing
+  llm_endpoint:
+    description: Foundation Model endpoint used by the summarization agent
+    default: databricks-claude-sonnet-4-5
+
+include:
+  - resources/*.pipeline.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-984752964297111.11.azuredatabricks.net
+  prod:
+    mode: production
+    workspace:
+      host: https://adb-984752964297111.11.azuredatabricks.net

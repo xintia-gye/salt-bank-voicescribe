@@ -46,7 +46,10 @@ salt-bank-voicescribe/
 ├── .env.example              # config template (no secrets committed)
 ├── data/synthetic/           # synthetic RO/EN call recordings + metadata
 ├── notebooks/                # committed notebooks with outputs (evidence)
-├── pipelines/                # Lakeflow Declarative Pipeline definitions
+├── pipelines/voicescribe_pipeline/  # Lakeflow Declarative Pipeline (Databricks Asset Bundle)
+│   ├── databricks.yml               #   bundle config (dev/prod targets)
+│   ├── resources/*.pipeline.yml     #   serverless pipeline definition
+│   └── src/transformations/*.sql    #   bronze → silver → gold (Auto Loader, MVs, ai_query)
 ├── agent/                    # GenAI summarization agent + UC function tools
 ├── genie/                    # Genie space config + example questions
 ├── app/
@@ -79,7 +82,7 @@ Built and verified on the Databricks workspace `adb-984752964297111`, catalog
 
 | Layer | Status | Detail |
 |-------|--------|--------|
-| 1 · Lakeflow + UC | ✅ live | **Deployed Lakeflow pipeline** `voicescribe_medallion` (serverless) runs Bronze→Silver→Gold; UC catalog + `raw_audio` volume; 40 calls (28 RO, 12 EN) |
+| 1 · Lakeflow + UC | ✅ live | **Deployed Lakeflow Declarative Pipeline** (Asset Bundle, serverless, Auto Loader → streaming tables → MVs) publishing to schema `voicescribe_pipeline`; UC catalog + `raw_audio` volume; 40 calls (28 RO, 12 EN) |
 | 3 · ML (Whisper STT) | ✅ live | 40 transcripts in Silver |
 | 4 · GenAI agent (Claude) | ✅ live | `ai_query` over all 40 → Gold; **100% category accuracy**; `create_ticket` UC function |
 | 2 · Lakebase | ✅ live | `voicescribe-oltp` (PG 16), 40 rows in `call_summaries` |

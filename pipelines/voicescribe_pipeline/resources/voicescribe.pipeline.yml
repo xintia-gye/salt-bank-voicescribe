@@ -1,0 +1,16 @@
+resources:
+  pipelines:
+    voicescribe_medallion:
+      name: voicescribe-medallion
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      photon: true
+      channel: CURRENT
+      development: true
+      configuration:
+        landing_volume: ${var.landing_volume}
+        llm_endpoint: ${var.llm_endpoint}
+      libraries:
+        - glob:
+            include: ../src/transformations/**

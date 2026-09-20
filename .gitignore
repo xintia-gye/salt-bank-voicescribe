@@ -29,3 +29,8 @@ app/frontend/build/
 # Large / generated audio (keep only small committed samples in data/synthetic)
 *.wav.tmp
 scratch/
+
+# Databricks Asset Bundle build/state artifacts
+.databricks/
+*.tfstate
+*.tfstate.*
