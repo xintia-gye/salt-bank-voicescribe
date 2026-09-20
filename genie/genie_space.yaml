@@ -1,0 +1,35 @@
+# Salt Bank VoiceScribe — Genie Space (Layer 5)
+#
+# Genie provides natural-language analytics over the Gold call-summary table.
+# The Gold table is created and populated by notebooks 01 & 03 and is fully
+# query-ready. Create the space in the workspace UI (Genie → New space) using
+# the config below, or via the Genie API once serialized_space is available.
+
+display_name: "Salt Bank VoiceScribe — Call Analytics"
+description: >
+  Natural-language analytics over Salt Bank customer support call summaries:
+  volumes, categories, sentiment, agent performance, language, and duration.
+
+warehouse_id: "148ccb90800933a1"   # Shared Endpoint (X-Large) on the bolt workspace
+
+tables:
+  - salt_bank_voicescribe.voicescribe.gold_call_summaries
+
+# Column semantics to guide Genie
+instructions: |
+  - category is one of: card_lost, fraud_dispute, loan_inquiry, app_technical, account_closure, other.
+  - sentiment is one of: positive, neutral, negative.
+  - language is 'ro' (Romanian) or 'en' (English).
+  - duration_seconds is the call length; divide by 60 for minutes.
+  - ticket_id is the follow-up ticket the agent auto-filed.
+  - Each row is one customer support call.
+
+sample_questions:
+  - "How many calls did we have by category?"
+  - "How many fraud disputes are there?"
+  - "What is the average call duration by agent, in minutes?"
+  - "Show the share of negative-sentiment calls by language."
+  - "Which agent handled the most account closure calls?"
+  - "What are the top call reasons this month?"
+
+# These queries are validated against the live Gold table (see notebooks/04_genie_queries.sql)
