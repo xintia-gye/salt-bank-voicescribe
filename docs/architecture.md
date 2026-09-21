@@ -1,8 +1,8 @@
-# Architecture & Effie Submission Plan
+# Architecture & Solution Plan
 
-The full architecture and Effie submission plan is maintained as a Google Doc:
+The full architecture and solution plan is maintained as a Google Doc:
 
-- **Architecture & Effie Submission Plan:** https://docs.google.com/document/d/1niJnKFRscitkE2_rdDVvRvO4u_h0whtv6DXvwP4YA-M/edit
+- **Architecture & Solution Plan:** https://docs.google.com/document/d/1niJnKFRscitkE2_rdDVvRvO4u_h0whtv6DXvwP4YA-M/edit
 - **Demo Narrative & Executive Pitch:** https://docs.google.com/document/d/15WrAgORFe40QOpo5Z2jyKcYEVFTz5nVjGLVNzWlCQrU/edit
 
 See the [README](../README.md) for the six-layer architecture summary and data flow.

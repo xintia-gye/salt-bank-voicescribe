@@ -1,6 +1,6 @@
 # VoiceScribe — Demo & Evidence Runbook
 
-Everything needed to record the 3–5 minute Effie demo and capture evidence.
+Everything needed to record the 3–5 minute demo and capture evidence.
 All resources are live on the **bolt** workspace (`adb-984752964297111`),
 catalog `salt_bank_voicescribe.voicescribe`.
 
@@ -32,10 +32,10 @@ catalog `salt_bank_voicescribe.voicescribe`.
 6. **Twilio + close (20s)** — Mention the pluggable Twilio webhook path for real calls;
    restate the value: minutes saved per call, consistent compliant summaries.
 
-## Effie submission checklist
+## Submission checklist
 
 - [x] One functional build, all six layers — live on bolt workspace
-- [ ] Committed notebooks **with outputs** — run notebooks 01→05 top-to-bottom in the
+- [ ] Committed notebooks **with outputs** — run notebooks 01→06 top-to-bottom in the
       workspace, then export/commit (`docs/` has the SQL; import the `notebooks/` files)
 - [ ] Screenshots — app (Calls, detail, Dashboard), Catalog Explorer lineage, Genie answer
 - [ ] 3–5 min screen recording — follow the flow above
