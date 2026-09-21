@@ -69,7 +69,6 @@ def health():
         "is_databricks_app": settings.is_databricks_app,
         "lakebase_available": lakebase_ok,
         "approvals_store": "lakebase" if lakebase_ok else "in-memory",
-        "lakebase_diag": lakebase.diagnostics(),
     }
 
 

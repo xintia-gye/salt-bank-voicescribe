@@ -55,19 +55,6 @@ def last_error() -> str | None:
     return _last_error
 
 
-def diagnostics() -> dict:
-    host, user, token = _resolve_host_user_token()
-    return {
-        "have_psycopg2": _HAVE_PG,
-        "env_pghost": bool(_HOST),
-        "env_pguser": _PGUSER,
-        "resolved_host": host,
-        "resolved_user": user,
-        "have_token": bool(token),
-        "last_error": _last_error,
-    }
-
-
 def _workspace_bearer() -> str | None:
     """Bearer token for the Databricks REST API (PAT locally, OAuth SP in app)."""
     if _settings.token:
