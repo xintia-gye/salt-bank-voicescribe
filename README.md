@@ -98,14 +98,6 @@ query time across the app, Genie, and SQL (see `notebooks/06_pii_masking.sql`).
 
 See [docs/DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md) for the recording flow and evidence checklist.
 
-## Effie submission mapping
-
-- ✅ **One functional build, all six layers** — see table above.
-- ⏳ **Evidence it ran** — run notebooks 01→05 for committed outputs; capture app/Genie/lineage screenshots + 3–5 min recording (see runbook).
-- ✅ **Readable repo** — this README, synthetic data only, secrets excluded.
-- ⏳ **Deck** — Google Slides / PDF (prepared separately).
-- ⏳ **Yoodli roleplay ≥ 75%** — delivery practice on the demo narrative.
-
 ---
 
-*Built for the Effie submission. Salt Bank is a digital bank; this is a field-engineering demonstration built on synthetic data.*
+*Salt Bank is a digital bank; this is a field-engineering demonstration built on synthetic data.*
