@@ -33,6 +33,17 @@ env:
   # Genie space (Layer 5) for supervisor natural-language analytics.
   - name: GENIE_SPACE_ID
     value: "01f1b52b26c11cacb12269806671aa8e"
+  # Lakebase (Layer 2) — operational store for approval/edit workflow state.
+  # Attach a "database" app resource pointing at the voicescribe-oltp instance;
+  # it injects PGHOST/PGUSER/PGDATABASE/PGPORT. LAKEBASE_INSTANCE is the
+  # fallback used to look up the host + mint credentials via the SDK.
+  - name: LAKEBASE_INSTANCE
+    value: voicescribe-oltp
+  # Postgres role = the app service principal's client id (registered as a
+  # DATABRICKS_SUPERUSER role on the instance). Set explicitly so the DB user
+  # is correct even if DATABRICKS_CLIENT_ID resolution differs.
+  - name: PGUSER
+    value: "9e31c274-1462-43c6-b381-79aa5909ed91"
   # When you provision Twilio, set INGEST_ADAPTER=twilio and add TWILIO_AUTH_TOKEN
   # as a secret-backed resource, e.g.:
   # - name: TWILIO_AUTH_TOKEN

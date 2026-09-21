@@ -6,8 +6,9 @@ Auth resolves in this order:
   2. OAuth service principal (DATABRICKS_CLIENT_ID / _SECRET) via the SDK
      credential provider — typical inside a Databricks App.
 
-Approval status is tracked in a small in-memory store (a stub for the demo;
-in production this would be a Lakebase Postgres table). See approvals below.
+Approval / edit status is persisted in Lakebase (Postgres, Layer 2) via the
+`lakebase` module. If Lakebase is unavailable or unconfigured, we transparently
+fall back to a small in-memory store (demo mode) so the app never hard-fails.
 """
 from __future__ import annotations
 
@@ -17,11 +18,12 @@ from typing import Any
 
 from databricks import sql as dbsql
 
+from . import lakebase
 from .config import get_settings
 
 _settings = get_settings()
 
-# --- Approval status stub (would be a Lakebase table in production) ---
+# --- In-memory fallback used only when Lakebase is unreachable (demo mode) ---
 _approvals: dict[str, dict[str, Any]] = {}
 _approvals_lock = threading.Lock()
 
@@ -89,7 +91,31 @@ def _coerce_action_items(value: Any) -> list[str]:
     return [str(value)]
 
 
-def _serialize(row: dict[str, Any]) -> dict[str, Any]:
+def _status_for(call_id: str, status_map: dict[str, dict] | None) -> dict[str, Any]:
+    """Resolve a call's workflow status: prefetched map -> Lakebase -> stub."""
+    if status_map is not None:
+        return status_map.get(call_id) or {}
+    # Per-call: try Lakebase, fall back to in-memory stub.
+    try:
+        appr = lakebase.get_status(call_id)
+        if appr is not None:
+            return appr
+    except Exception:  # noqa: BLE001
+        pass
+    with _approvals_lock:
+        return _approvals.get(call_id) or {}
+
+
+def _prefetch_statuses() -> dict[str, dict] | None:
+    """Batch-load all statuses from Lakebase for list views; None on failure."""
+    try:
+        return lakebase.get_all_statuses()
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _serialize(row: dict[str, Any],
+               status_map: dict[str, dict] | None = None) -> dict[str, Any]:
     """JSON-friendly output: ISO timestamps, parsed action_items, approval merge."""
     out: dict[str, Any] = {}
     for k, v in row.items():
@@ -99,15 +125,13 @@ def _serialize(row: dict[str, Any]) -> dict[str, Any]:
             out[k] = v
     if "action_items" in out:
         out["action_items"] = _coerce_action_items(out["action_items"])
-    # merge approval status stub
     call_id = out.get("call_id")
     if call_id:
-        with _approvals_lock:
-            appr = _approvals.get(call_id)
-        out["approval_status"] = (appr or {}).get("status", "pending")
-        out["edited_summary"] = (appr or {}).get("edited_summary")
-        out["approved_by"] = (appr or {}).get("approved_by")
-        out["approved_at"] = (appr or {}).get("approved_at")
+        appr = _status_for(call_id, status_map)
+        out["approval_status"] = appr.get("status", "pending")
+        out["edited_summary"] = appr.get("edited_summary")
+        out["approved_by"] = appr.get("approved_by")
+        out["approved_at"] = appr.get("approved_at")
     return out
 
 
@@ -140,7 +164,8 @@ def list_calls(filters: dict[str, str | None]) -> list[dict[str, Any]]:
         params.extend([like, like, like])
     where = ("WHERE " + " AND ".join(clauses)) if clauses else ""
     rows = query(_LIST_SQL.format(where=where), params)
-    return [_serialize(r) for r in rows]
+    status_map = _prefetch_statuses()
+    return [_serialize(r, status_map) for r in rows]
 
 
 _DETAIL_SQL = """
@@ -217,10 +242,18 @@ def get_stats() -> dict[str, Any]:
 
 
 # --------------------------------------------------------------------------
-# Approval stub
+# Approval persistence — Lakebase first, in-memory fallback
 # --------------------------------------------------------------------------
 def set_approval(call_id: str, status: str, edited_summary: str | None,
                  approved_by: str | None) -> dict[str, Any]:
+    # Try Lakebase (durable, shared). Fall back to in-memory on any failure.
+    try:
+        record = lakebase.set_status(call_id, status, edited_summary, approved_by)
+        record["persisted"] = "lakebase"
+        return record
+    except Exception as exc:  # noqa: BLE001
+        print(f"[db] Lakebase write failed, using in-memory stub: {exc}")
+
     import datetime as _dt
 
     record = {
@@ -228,6 +261,7 @@ def set_approval(call_id: str, status: str, edited_summary: str | None,
         "edited_summary": edited_summary,
         "approved_by": approved_by or "operator",
         "approved_at": _dt.datetime.utcnow().isoformat() + "Z",
+        "persisted": "memory",
     }
     with _approvals_lock:
         _approvals[call_id] = record

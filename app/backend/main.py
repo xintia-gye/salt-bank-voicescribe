@@ -22,7 +22,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import db, genie
+from . import db, genie, lakebase
 from .config import get_settings
 from .ingest import get_adapter
 
@@ -57,11 +57,19 @@ class GenieRequest(BaseModel):
 # --------------------------------------------------------------------------
 @app.get("/api/health")
 def health():
+    lakebase_ok = False
+    try:
+        lakebase_ok = lakebase.is_available()
+    except Exception:  # noqa: BLE001
+        lakebase_ok = False
     return {
         "status": "ok",
         "db_configured": settings.db_configured,
         "ingest_adapter": settings.ingest_adapter,
         "is_databricks_app": settings.is_databricks_app,
+        "lakebase_available": lakebase_ok,
+        "approvals_store": "lakebase" if lakebase_ok else "in-memory",
+        "lakebase_diag": lakebase.diagnostics(),
     }
 
 
