@@ -96,8 +96,6 @@ Run locally instead via `app/run_local.sh`.
 tables — phone numbers and card/IBAN digits are masked for non-admins, enforced at
 query time across the app, Genie, and SQL (see `notebooks/06_pii_masking.sql`).
 
-See [docs/DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md) for the recording flow and evidence checklist.
-
 ---
 
 *Salt Bank is a digital bank; this is a field-engineering demonstration built on synthetic data.*
