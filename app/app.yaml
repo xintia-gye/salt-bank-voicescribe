@@ -44,6 +44,10 @@ env:
   # is correct even if DATABRICKS_CLIENT_ID resolution differs.
   - name: PGUSER
     value: "9e31c274-1462-43c6-b381-79aa5909ed91"
+  # Layer 3 — Whisper speech-to-text Model Serving endpoint (GPU, scale-to-zero).
+  # Used to transcribe real call audio into silver_transcripts in production.
+  - name: STT_ENDPOINT_NAME
+    value: voicescribe-whisper-stt
   # When you provision Twilio, set INGEST_ADAPTER=twilio and add TWILIO_AUTH_TOKEN
   # as a secret-backed resource, e.g.:
   # - name: TWILIO_AUTH_TOKEN
