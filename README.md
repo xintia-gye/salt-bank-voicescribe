@@ -102,6 +102,11 @@ query time across the app, Genie, and SQL (see `notebooks/06_pii_masking.sql`).
 
 See [docs/DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md) for the recording flow and evidence checklist.
 
+**How this was built with AI:** [docs/BUILD_WITH_AI.md](docs/BUILD_WITH_AI.md) — the
+build-process account (tool choice, layer-by-layer workflow from real git history,
+prompt strategy, a real iteration/trade-off, and where Claude Code was the force
+multiplier), as distinct from the product's runtime flow.
+
 ## Proof it ran — execution evidence (inlined)
 
 The build was **executed end-to-end on Databricks**. The outputs below are captured
