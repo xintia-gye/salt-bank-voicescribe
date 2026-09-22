@@ -14,6 +14,7 @@ sets, and a run log from the deployed pipeline, app, and agent.
 | 4 | [`04_pipeline_run_log.txt`](04_pipeline_run_log.txt) | The **Lakeflow pipeline ran** — flow-by-flow run log ending in `Update ... is COMPLETED` |
 | 5 | [`05_transcript_to_summary.json`](05_transcript_to_summary.json) | The **GenAI agent executed** — one real transcript → AI summary + action items + ticket (with PII masked live) |
 | 6 | [`06_app_api_responses.txt`](06_app_api_responses.txt) | The **app serves real data** — live `/api/calls` response incl. a Lakebase-persisted approval |
+| 7 | [`07_pipeline_rerun_log.txt`](07_pipeline_rerun_log.txt) | The **pipeline re-ran clean today** — full flow log for a freshly triggered update (`acd511`), all flows `COMPLETED`, + post-run layer counts/accuracy. Reproduce it with [`notebooks/07_pipeline_run_evidence.py`](../../notebooks/07_pipeline_run_evidence.py) |
 
 ## Headline results (from the captured files)
 

@@ -1,0 +1,33 @@
+Pipeline: voicescribe-medallion (86e45489-d65a-440c-8c40-3831561a7f6a)
+Workspace: adb-984752964297111
+Update:    acd51175-5803-42ac-95cd-5737b2affe1e  (triggered live via API on 2026-09-22)
+
+Captured by notebook: notebooks/07_pipeline_run_evidence.py
+
+2026-09-22T11:57:02.271Z INFO update_progress: Update acd511 is RUNNING.
+2026-09-22T11:57:02.310Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.gold_call_summaries' is QUEUED.
+2026-09-22T11:57:02.365Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.silver_transcripts' is QUEUED.
+2026-09-22T11:57:02.368Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_transcripts' is QUEUED.
+2026-09-22T11:57:02.370Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_calls' is QUEUED.
+2026-09-22T11:57:02.705Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_calls' is STARTING.
+2026-09-22T11:57:09.722Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_calls' is RUNNING.
+2026-09-22T11:57:10.520Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_transcripts' is STARTING.
+2026-09-22T11:57:11.215Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_transcripts' is RUNNING.
+2026-09-22T11:57:16.746Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_calls' has COMPLETED.
+2026-09-22T11:57:16.955Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_transcripts' has COMPLETED.
+2026-09-22T11:57:17.069Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.silver_transcripts' is PLANNING.
+2026-09-22T11:57:23.419Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.silver_transcripts' has been planned to be executed as COMPLETE_RECOMPUTE.
+2026-09-22T11:57:23.550Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.silver_transcripts' is STARTING.
+2026-09-22T11:57:23.802Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.silver_transcripts' is RUNNING.
+2026-09-22T11:57:28.786Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.silver_transcripts' has COMPLETED.
+2026-09-22T11:57:28.808Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.gold_call_summaries' is PLANNING.
+2026-09-22T11:57:33.306Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.gold_call_summaries' has been planned to be executed as COMPLETE_RECOMPUTE.
+2026-09-22T11:57:33.318Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.gold_call_summaries' is STARTING.
+2026-09-22T11:57:33.434Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.gold_call_summaries' is RUNNING.
+2026-09-22T11:58:01.068Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.gold_call_summaries' has COMPLETED.
+2026-09-22T11:58:01.243Z INFO update_progress: Update acd511 is COMPLETED.
+
+Post-run verification (voicescribe_pipeline schema):
+  bronze_calls=40, bronze_transcripts=40, silver_transcripts=40, gold_call_summaries=40
+  category distribution: card_lost 13, loan_inquiry 7, fraud_dispute 7, account_closure 7, app_technical 6
+  category accuracy vs. expected_category: 100.0% over 40 calls
