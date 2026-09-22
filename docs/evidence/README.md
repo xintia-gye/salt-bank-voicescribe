@@ -6,6 +6,15 @@ captured live from the running system on the **bolt** workspace
 Nothing here is mocked or hand-written — these are raw responses, query result
 sets, and a run log from the deployed pipeline, app, and agent.
 
+> **Committed execution output (row 9).** The single strongest artifact is
+> [`notebooks/07_pipeline_run_evidence.executed.ipynb`](../../notebooks/07_pipeline_run_evidence.executed.ipynb):
+> the notebook was **run on Databricks** (job run `221692384572973`, result
+> `SUCCESS`), it **triggered its own fresh pipeline update** (`356db78f`) which
+> reached `COMPLETED`, and the file carries the **actual output cells Databricks
+> generated** — the printed run states and the query result tables. These outputs
+> were exported from the run, not typed. The untampered Databricks HTML export sits
+> next to it as [`07_pipeline_run_evidence.executed.html`](07_pipeline_run_evidence.executed.html).
+
 | # | File | Proves |
 |---|------|--------|
 | 1 | [`01_health_check.json`](01_health_check.json) | The **app is running** — live `/api/health` response (`db_configured`, `lakebase_available`, etc.) |
@@ -16,6 +25,7 @@ sets, and a run log from the deployed pipeline, app, and agent.
 | 6 | [`06_app_api_responses.txt`](06_app_api_responses.txt) | The **app serves real data** — live `/api/calls` response incl. a Lakebase-persisted approval |
 | 7 | [`07_pipeline_rerun_log.txt`](07_pipeline_rerun_log.txt) | The **pipeline re-ran clean today** — full flow log for a freshly triggered update (`acd511`), all flows `COMPLETED`, + post-run layer counts/accuracy. Reproduce it with [`notebooks/07_pipeline_run_evidence.py`](../../notebooks/07_pipeline_run_evidence.py) |
 | 8 | [`07_pipeline_run_outcome.md`](07_pipeline_run_outcome.md) | The **rendered notebook outcome** — every step of [`notebooks/07_pipeline_run_evidence.py`](../../notebooks/07_pipeline_run_evidence.py) with its output, viewable without opening Databricks |
+| 9 | [`notebooks/07_pipeline_run_evidence.executed.ipynb`](../../notebooks/07_pipeline_run_evidence.executed.ipynb) | The **executed notebook with committed output cells** — Databricks job run `221692384572973` (`SUCCESS`); the notebook triggered its own fresh pipeline update `356db78f` → `COMPLETED` and captured the real result tables. Raw Databricks export: [`07_pipeline_run_evidence.executed.html`](07_pipeline_run_evidence.executed.html) |
 
 ## Headline results (from the captured files)
 
