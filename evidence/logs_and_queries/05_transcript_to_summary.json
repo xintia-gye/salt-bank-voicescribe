@@ -1,0 +1,14 @@
+{
+  "note": "PII (card digits) masked as [REDACTED] by Unity Catalog column mask for non-admin reader",
+  "example": {
+    "call_id": "CALL-0651376088",
+    "language": "en",
+    "transcript": "AGENT: Salt Bank, good afternoon, how can I help?\nCUSTOMER: Hi, I lost my card yesterday and I want to block it.\nAGENT: I'm sorry to hear that. I can block it right now. Can you confirm your name and date of birth?\nCUSTOMER: Yes, it's Ana M., born on the 14th of March.\nAGENT: Thank you. Your card ending [REDACTED] is now blocked. Shall I order a replacement?\nCUSTOMER: Yes please, to my home address.\nAGENT: Done. It arrives in 3 to 5 working days. Anything else?\nCUSTOMER: No, thank you very much.",
+    "summary": "Customer reported a lost card and requested it be blocked. Agent successfully blocked the card ending in [REDACTED] and ordered a replacement to be delivered to the customer's home address within 3-5 working days.",
+    "action_items": "[\"Card ending 4471 blocked\",\"Replacement card ordered to home address\",\"Delivery expected in 3-5 working days\"]",
+    "category": "card_lost",
+    "sentiment": "positive",
+    "ticket_id": "SB-6A4681CD",
+    "llm_model": "databricks-claude-sonnet-4-5"
+  }
+}

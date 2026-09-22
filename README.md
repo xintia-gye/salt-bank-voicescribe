@@ -57,9 +57,10 @@ Rows returned: card_lost 13, account_closure 7, fraud_dispute 7, loan_inquiry 7,
 { "status": "ok", "db_configured": true, "lakebase_available": true, "approvals_store": "lakebase" }
 ```
 
-Full captured logs and cell-by-cell notebook runs:
-[`EXECUTION_EVIDENCE.txt`](EXECUTION_EVIDENCE.txt) ·
-[`docs/evidence/`](docs/evidence/)
+Full evidence folder: [`evidence/`](evidence/) (notebook outputs, logs & query
+results, screenshots PDF, validation metrics — indexed in
+[`evidence/README.md`](evidence/README.md)) · consolidated
+[`EXECUTION_EVIDENCE.txt`](EXECUTION_EVIDENCE.txt) · build account: [`BUILD.md`](BUILD.md)
 
 ---
 
@@ -229,6 +230,18 @@ Built and verified on the Databricks workspace `adb-984752964297111`, catalog
 | 2 · Lakebase | ✅ live | `voicescribe-oltp` (PG 16), 40 rows in `call_summaries` |
 | 5 · Genie | ✅ live | Space `01f1b52b26c11cacb12269806671aa8e`; conversational NL analytics, in the app's "Ask Genie" tab |
 | 6 · App + Twilio | ✅ deployed & running | FastAPI + React; Calls / Dashboard / Ask Genie tabs; synthetic + Twilio adapters |
+
+### Deployed vs. illustrative (what actually ran vs. what stands in)
+
+| Component | Deployed & executed (evidence captured) | Illustrative / stand-in |
+|-----------|------------------------------------------|--------------------------|
+| Lakeflow medallion pipeline | ✅ ran to `COMPLETED`, 40 rows/layer (`evidence/`) | — |
+| Claude summarization (`ai_query`) | ✅ real Gold output, 100% category accuracy | — |
+| Genie space | ✅ live conversation captured (Q→SQL→rows) | — |
+| Lakebase (Postgres) | ✅ approvals persisted; live `/api/health` | falls back to in-memory if token absent |
+| Whisper STT | ✅ transcripts in Silver; Model Serving path wired | synthetic calls ship as **transcripts** (no live audio); `faster-whisper` in-notebook used for evidence |
+| Twilio ingest | interface + webhook adapter implemented | **synthetic replay is the default**; live Twilio audio download is stubbed |
+| Call data | pipeline/queries/model run on it unchanged | **100% synthetic** (TTS/text), no real customers or PII |
 
 **Live app:** https://voicescribe-984752964297111.11.azure.databricksapps.com (Databricks SSO).
 Run locally instead via `app/run_local.sh`.

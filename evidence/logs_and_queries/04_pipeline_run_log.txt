@@ -1,0 +1,29 @@
+Pipeline: voicescribe-medallion (86e45489-d65a-440c-8c40-3831561a7f6a)
+Workspace: adb-984752964297111
+
+2026-09-20T20:09:41.068Z INFO create_update: Update 8d45b5 started by API_CALL.
+2026-09-20T20:09:43.314Z INFO update_progress: Update 8d45b5 is WAITING_FOR_RESOURCES.
+2026-09-20T20:09:56.269Z INFO update_progress: Update 8d45b5 is INITIALIZING.
+2026-09-20T20:10:18.717Z INFO update_progress: Update 8d45b5 is SETTING_UP_TABLES.
+2026-09-20T20:10:25.875Z INFO update_progress: Update 8d45b5 is RUNNING.
+2026-09-20T20:10:25.899Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.silver_transcripts' is QUEUED.
+2026-09-20T20:10:25.912Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.gold_call_summaries' is QUEUED.
+2026-09-20T20:10:25.914Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_transcripts' is QUEUED.
+2026-09-20T20:10:25.916Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_calls' is QUEUED.
+2026-09-20T20:10:26.134Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_calls' is STARTING.
+2026-09-20T20:10:28.112Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_calls' is RUNNING.
+2026-09-20T20:10:28.278Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_transcripts' is STARTING.
+2026-09-20T20:10:29.506Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_transcripts' is RUNNING.
+2026-09-20T20:10:36.672Z INFO flow_progress: Completed a streaming update of 'salt_bank_voicescribe.voicescribe_pipeline.bronze_calls'.
+2026-09-20T20:10:36.754Z INFO flow_progress: Completed a streaming update of 'salt_bank_voicescribe.voicescribe_pipeline.bronze_transcripts'.
+2026-09-20T20:10:36.777Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_transcripts' has COMPLETED.
+2026-09-20T20:10:36.783Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.bronze_calls' has COMPLETED.
+2026-09-20T20:10:36.848Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.silver_transcripts' is PLANNING.
+2026-09-20T20:10:38.191Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.silver_transcripts' is STARTING.
+2026-09-20T20:10:38.336Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.silver_transcripts' is RUNNING.
+2026-09-20T20:10:42.907Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.silver_transcripts' has COMPLETED.
+2026-09-20T20:10:42.912Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.gold_call_summaries' is PLANNING.
+2026-09-20T20:10:43.882Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.gold_call_summaries' is STARTING.
+2026-09-20T20:10:43.968Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.gold_call_summaries' is RUNNING.
+2026-09-20T20:11:05.951Z INFO flow_progress: Flow 'salt_bank_voicescribe.voicescribe_pipeline.gold_call_summaries' has COMPLETED.
+2026-09-20T20:11:05.994Z INFO update_progress: Update 8d45b5 is COMPLETED.

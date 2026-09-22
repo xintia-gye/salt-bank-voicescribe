@@ -1,0 +1,35 @@
+{
+  "space_id": "01f1b52b26c11cacb12269806671aa8e",
+  "conversation_id": "01f1b67423cf1668a2992b1128bc1b4a",
+  "message_id": "01f1b67423dc17afab0014ba9e338668",
+  "question": "How many calls are there by category?",
+  "status": "COMPLETED",
+  "generated_sql": "SELECT `category`, COUNT(*) AS `call_count`\nFROM `salt_bank_voicescribe`.`voicescribe`.`gold_call_summaries`\nWHERE `category` IS NOT NULL\nGROUP BY `category`\nORDER BY `call_count` DESC, `category` ASC",
+  "narrative_answer": "Would you like to see the counts including calls without a category as a separate group?",
+  "result_columns": [
+    "category",
+    "call_count"
+  ],
+  "result_rows": [
+    [
+      "card_lost",
+      "13"
+    ],
+    [
+      "account_closure",
+      "7"
+    ],
+    [
+      "fraud_dispute",
+      "7"
+    ],
+    [
+      "loan_inquiry",
+      "7"
+    ],
+    [
+      "app_technical",
+      "6"
+    ]
+  ]
+}

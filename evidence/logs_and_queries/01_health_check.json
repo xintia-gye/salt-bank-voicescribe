@@ -1,0 +1,8 @@
+{
+    "status": "ok",
+    "db_configured": true,
+    "ingest_adapter": "synthetic",
+    "is_databricks_app": true,
+    "lakebase_available": true,
+    "approvals_store": "lakebase"
+}

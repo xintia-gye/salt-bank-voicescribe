@@ -1,0 +1,134 @@
+{
+  "workspace": "adb-984752964297111",
+  "warehouse_id": "148ccb90800933a1",
+  "catalog": "salt_bank_voicescribe",
+  "schema": "voicescribe",
+  "captured": "2026-09-22",
+  "queries": [
+    {
+      "sql": "SELECT count(*) AS gold_rows FROM gold_call_summaries",
+      "state": "SUCCEEDED",
+      "columns": [
+        "gold_rows"
+      ],
+      "rows": [
+        [
+          "40"
+        ]
+      ]
+    },
+    {
+      "sql": "SELECT call_id, agent, language, category, sentiment, ticket_id, duration_seconds FROM gold_call_summaries ORDER BY started_at LIMIT 6",
+      "state": "SUCCEEDED",
+      "columns": [
+        "call_id",
+        "agent",
+        "language",
+        "category",
+        "sentiment",
+        "ticket_id",
+        "duration_seconds"
+      ],
+      "rows": [
+        [
+          "CALL-a82dce985c",
+          "E. Marin",
+          "ro",
+          "card_lost",
+          "neutral",
+          "SB-00A0C6AD",
+          "284"
+        ],
+        [
+          "CALL-00ce224f10",
+          "C. Dumitru",
+          "ro",
+          "card_lost",
+          "neutral",
+          "SB-7BE259A7",
+          "124"
+        ],
+        [
+          "CALL-ed7b057e28",
+          "M. Ionescu",
+          "en",
+          "loan_inquiry",
+          "positive",
+          "SB-0BB04A8B",
+          "212"
+        ],
+        [
+          "CALL-a5875e8b30",
+          "C. Dumitru",
+          "ro",
+          "card_lost",
+          "neutral",
+          "SB-FDE72543",
+          "284"
+        ],
+        [
+          "CALL-0651376088",
+          "A. Popescu",
+          "en",
+          "card_lost",
+          "positive",
+          "SB-6A4681CD",
+          "371"
+        ],
+        [
+          "CALL-1216c888bd",
+          "E. Marin",
+          "ro",
+          "loan_inquiry",
+          "positive",
+          "SB-A72A4BF7",
+          "349"
+        ]
+      ]
+    },
+    {
+      "sql": "SELECT category, count(*) AS calls FROM gold_call_summaries GROUP BY category ORDER BY calls DESC",
+      "state": "SUCCEEDED",
+      "columns": [
+        "category",
+        "calls"
+      ],
+      "rows": [
+        [
+          "card_lost",
+          "13"
+        ],
+        [
+          "account_closure",
+          "7"
+        ],
+        [
+          "loan_inquiry",
+          "7"
+        ],
+        [
+          "fraud_dispute",
+          "7"
+        ],
+        [
+          "app_technical",
+          "6"
+        ]
+      ]
+    },
+    {
+      "sql": "SELECT round(100.0*sum(CASE WHEN g.category=b.expected_category THEN 1 ELSE 0 END)/count(*),1) AS category_accuracy_pct, count(*) AS calls FROM gold_call_summaries g JOIN bronze_calls b USING (call_id)",
+      "state": "SUCCEEDED",
+      "columns": [
+        "category_accuracy_pct",
+        "calls"
+      ],
+      "rows": [
+        [
+          "97.6",
+          "41"
+        ]
+      ]
+    }
+  ]
+}

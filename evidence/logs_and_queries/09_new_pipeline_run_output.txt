@@ -1,0 +1,92 @@
+================================================================================
+ SALT BANK VOICESCRIBE - NEW LAKEFLOW PIPELINE (created, run, output captured)
+================================================================================
+
+ A NEW Lakeflow declarative pipeline was created in the Databricks workspace
+ (dev mode) and run end-to-end. This file is the committed output of that run.
+
+ Pipeline name : voicescribe-medallion-demo
+ Pipeline ID   : 6010b3d7-2beb-4591-b1d1-71beb3573a5d
+ Update ID     : 3bd8e45b-3bdd-4151-bd79-ed8621a06091  -> COMPLETED
+ Workspace     : adb-984752964297111 (bolt)
+ Catalog.schema: salt_bank_voicescribe.voicescribe_pipeline_demo
+ Compute       : serverless, Photon, development mode
+ Created by    : xintia.gyenge@databricks.com
+ Captured      : 2026-09-22
+
+ Every value below was produced by Databricks during the run - not hand-written.
+
+================================================================================
+ [1] RUN TRACE - all four flows COMPLETED (bronze -> silver -> gold)
+================================================================================
+    2026-09-22T16:04:48.956Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.bronze_calls' is QUEUED.
+    2026-09-22T16:04:49.002Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.gold_call_summaries' is QUEUED.
+    2026-09-22T16:04:49.005Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.silver_transcripts' is QUEUED.
+    2026-09-22T16:04:49.006Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.bronze_transcripts' is QUEUED.
+    2026-09-22T16:04:49.294Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.bronze_transcripts' is STARTING.
+    2026-09-22T16:04:51.293Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.bronze_transcripts' is RUNNING.
+    2026-09-22T16:04:51.916Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.bronze_calls' is STARTING.
+    2026-09-22T16:04:53.163Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.bronze_calls' is RUNNING.
+    2026-09-22T16:05:01.382Z INFO Completed a streaming update of 'salt_bank_voicescribe.voicescribe_pipeline_demo.bronze_calls'.
+    2026-09-22T16:05:01.491Z INFO Completed a streaming update of 'salt_bank_voicescribe.voicescribe_pipeline_demo.bronze_transcripts'.
+    2026-09-22T16:05:01.503Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.bronze_calls' has COMPLETED.
+    2026-09-22T16:05:01.511Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.bronze_transcripts' has COMPLETED.
+    2026-09-22T16:05:01.597Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.silver_transcripts' is PLANNING.
+    2026-09-22T16:05:04.015Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.silver_transcripts' has been planned to be executed as COMPLETE_RECOMPUTE.
+    2026-09-22T16:05:04.119Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.silver_transcripts' is STARTING.
+    2026-09-22T16:05:04.381Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.silver_transcripts' is RUNNING.
+    2026-09-22T16:05:09.514Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.silver_transcripts' has COMPLETED.
+    2026-09-22T16:05:09.521Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.gold_call_summaries' is PLANNING.
+    2026-09-22T16:05:10.578Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.gold_call_summaries' has been planned to be executed as COMPLETE_RECOMPUTE.
+    2026-09-22T16:05:10.585Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.gold_call_summaries' is STARTING.
+    2026-09-22T16:05:10.680Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.gold_call_summaries' is RUNNING.
+    2026-09-22T16:05:32.401Z INFO Flow 'salt_bank_voicescribe.voicescribe_pipeline_demo.gold_call_summaries' has COMPLETED.
+    2026-09-22T16:05:32.550Z INFO Update 3bd8e4 is COMPLETED.
+
+================================================================================
+ [2] LAYER ROW COUNTS  (SELECT count(*) per table)
+================================================================================
+    layer_table         | rows
+    --------------------+-----
+    bronze_calls        | 40
+    bronze_transcripts  | 40
+    silver_transcripts  | 40
+    gold_call_summaries | 40
+
+    40 calls in -> 40 structured summaries out; no rows dropped across the medallion.
+
+================================================================================
+ [3] CATEGORY DISTRIBUTION  (GROUP BY category)
+================================================================================
+    category        | calls
+    ----------------+------
+    card_lost       | 13
+    loan_inquiry    | 7
+    fraud_dispute   | 7
+    account_closure | 7
+    app_technical   | 6
+
+================================================================================
+ [4] GENAI CLASSIFICATION ACCURACY vs GROUND TRUTH
+================================================================================
+    SELECT round(100.0*sum(CASE WHEN g.category=b.expected_category THEN 1 ELSE 0 END)
+           /count(*),1) AS accuracy_pct, count(*) AS calls
+    FROM gold_call_summaries g JOIN bronze_calls b USING (call_id);
+
+    accuracy_pct | calls
+    -------------+------
+    100.0        | 40
+
+================================================================================
+ [5] SAMPLE GOLD ROWS  (structured AI summary + auto-filed ticket)
+================================================================================
+    call_id         | lang | category     | sentiment | ticket_id   | summary (truncated)
+    ----------------+------+--------------+-----------+-------------+--------------------
+    CALL-a82dce985c | ro   | card_lost    | neutral   | SB-00A0C6AD | Customer reported losing their card and requested it be blocked. Agent immediately blocked the card ending in 4471 and arranged a replacement...
+    CALL-00ce224f10 | ro   | card_lost    | neutral   | SB-7BE259A7 | Customer reported losing their card and requested it be blocked. Agent successfully blocked the card ending in 4471...
+    CALL-ed7b057e28 | en   | loan_inquiry | positive  | SB-0BB04A8B | Customer inquired about qualifying for a 10,000 euro personal loan for home renovation. Agent performed a soft check...
+
+================================================================================
+ RESULT: a NEW pipeline was created in the workspace, run in dev, and produced
+ correct bronze->silver->gold output with 100% category accuracy. The build runs.
+================================================================================
