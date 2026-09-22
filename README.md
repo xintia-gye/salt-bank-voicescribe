@@ -105,7 +105,15 @@ See [docs/DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md) for the recording flow and evid
 ## Proof it ran — execution evidence (inlined)
 
 The build was **executed end-to-end on Databricks**. The outputs below are captured
-**live** from those runs (not hand-written). Full artifacts — executed notebooks with
+**live** from those runs (not hand-written).
+
+> **Single-file proof:** [`docs/evidence/10_end_to_end_execution.txt`](docs/evidence/10_end_to_end_execution.txt)
+> contains all three, as plain text: **[A]** a committed pipeline run with
+> bronze/silver/gold row counts (40/40/40/40, 100% accuracy), **[B]** a sample
+> transcript and the structured summary the models produced, and **[C]** a real
+> Genie conversation (question → generated SQL → returned rows).
+
+Full artifacts — executed notebooks with
 output cells, raw run logs, JSON result sets — are in
 [docs/evidence/](docs/evidence/) (index: [docs/evidence/README.md](docs/evidence/README.md)),
 with plain-text renderings in

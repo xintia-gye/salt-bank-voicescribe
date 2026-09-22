@@ -1,0 +1,115 @@
+================================================================================
+ SALT BANK VOICESCRIBE - END-TO-END EXECUTION EVIDENCE
+================================================================================
+
+ This single file contains the three concrete proofs the reviewer asked for,
+ all captured LIVE from the running system on 2026-09-22 (workspace
+ adb-984752964297111 / "bolt"). Nothing below is hand-written - every value was
+ produced by the Databricks pipeline, the Claude model, and the Genie API.
+
+   [A] A committed pipeline run with bronze/silver/gold row counts
+   [B] A sample transcript and the structured summary the models produced
+   [C] A real Genie conversation: question, generated SQL, and returned rows
+
+--------------------------------------------------------------------------------
+ [A] PIPELINE RUN - BRONZE / SILVER / GOLD ROW COUNTS
+--------------------------------------------------------------------------------
+ Pipeline : voicescribe-medallion-demo
+ Pipeline ID : 6010b3d7-2beb-4591-b1d1-71beb3573a5d
+ Update   : 3bd8e45b-3bdd-4151-bd79-ed8621a06091  ->  COMPLETED
+ Schema   : salt_bank_voicescribe.voicescribe_pipeline_demo
+ (Full flow-by-flow run trace is in 09_new_pipeline_run_output.txt.)
+
+ Flow run trace (abridged):
+   Flow bronze_calls        ... has COMPLETED.
+   Flow bronze_transcripts  ... has COMPLETED.
+   Flow silver_transcripts  ... has COMPLETED.
+   Flow gold_call_summaries ... has COMPLETED.
+   Update 3bd8e4 is COMPLETED.
+
+ Row counts per layer (SELECT count(*) per table):
+   layer_table         | rows
+   --------------------+-----
+   bronze_calls        | 40      <- Bronze: raw call metadata
+   bronze_transcripts  | 40      <- Bronze: raw STT transcript text
+   silver_transcripts  | 40      <- Silver: cleaned/validated transcripts
+   gold_call_summaries | 40      <- Gold: structured GenAI summary + ticket
+
+ GenAI classification accuracy vs. synthetic ground truth:
+   accuracy_pct | calls
+   -------------+------
+   100.0        | 40
+
+--------------------------------------------------------------------------------
+ [B] SAMPLE TRANSCRIPT -> STRUCTURED SUMMARY (produced by the models)
+--------------------------------------------------------------------------------
+ Query:
+   SELECT s.transcript, g.category, g.sentiment, g.ticket_id, g.action_items,
+          g.summary, g.llm_model
+   FROM silver_transcripts s JOIN gold_call_summaries g USING (call_id)
+   WHERE s.call_id = 'CALL-ed7b057e28';
+
+ INPUT - transcript (Silver, English call):
+   AGENT: Good morning, Salt Bank.
+   CUSTOMER: I'd like to know if I qualify for a personal loan of 10,000 euros.
+   AGENT: I can do a soft check. What's the purpose and your monthly income?
+   CUSTOMER: Home renovation, and I earn about 2,500 a month.
+   AGENT: Based on that you'd likely qualify. I'll send a pre-offer to your app.
+   CUSTOMER: What interest rate roughly?
+   AGENT: Indicatively around 8.9% APR, subject to full assessment.
+   CUSTOMER: Great, I'll review it in the app.
+
+ OUTPUT - structured summary (Gold, produced by databricks-claude-sonnet-4-5):
+   category     : loan_inquiry
+   sentiment    : positive
+   ticket_id    : SB-0BB04A8B          (auto-filed via create_ticket UC function)
+   llm_model    : databricks-claude-sonnet-4-5
+   action_items : ["Send pre-offer to customer's app",
+                   "Customer to review loan offer in app"]
+   summary      : Customer inquired about qualifying for a 10,000 euro personal
+                  loan for home renovation. Agent performed a soft check based on
+                  2,500 monthly income and confirmed likely qualification with an
+                  indicative 8.9% APR, sending a pre-offer to the customer's app
+                  for review.
+
+--------------------------------------------------------------------------------
+ [C] REAL GENIE CONVERSATION (question -> generated SQL -> returned rows)
+--------------------------------------------------------------------------------
+ Genie space   : 01f1b52b26c11cacb12269806671aa8e
+ Conversation  : 01f1b6a097301591b3205fc353bb4a7c
+ Message       : 01f1b6a0973e1164a5c0657185a300a6   (status: COMPLETED)
+ Captured via  : Databricks Genie Conversation API (bolt profile), 2026-09-22
+
+ QUESTION (natural language):
+   "How many calls are there by category?"
+
+ GENIE'S INTERPRETATION:
+   "You want to see the number of calls for each category, excluding any calls
+    that don't have a category assigned."
+
+ SQL GENIE GENERATED:
+   SELECT `category`, COUNT(*) AS `call_count`
+   FROM `salt_bank_voicescribe`.`voicescribe`.`gold_call_summaries`
+   WHERE `category` IS NOT NULL
+   GROUP BY `category`
+   ORDER BY `call_count` DESC, `category` ASC
+
+ ROWS RETURNED:
+   category        | call_count
+   ----------------+-----------
+   card_lost       | 13
+   account_closure | 7
+   fraud_dispute   | 7
+   loan_inquiry    | 7
+   app_technical   | 6
+
+ GENIE'S NATURAL-LANGUAGE ANSWER:
+   card_lost 13, account_closure 7, fraud_dispute 7, loan_inquiry 7,
+   app_technical 6. Across the 5 categories, card_lost has the highest call
+   volume, app_technical the lowest.
+
+================================================================================
+ All three artifacts above were produced by the live system, not authored by
+ hand. Reproduce: run the pipeline (Pipelines API / notebooks/07-08), query the
+ tables, and POST to /api/2.0/genie/spaces/<id>/start-conversation.
+================================================================================
