@@ -112,6 +112,13 @@ multiplier), as distinct from the product's runtime flow.
 The build was **executed end-to-end on Databricks**. The outputs below are captured
 **live** from those runs (not hand-written).
 
+> **Notebook execution proof (plain text):**
+> [`docs/evidence/11_notebook_execution_proof.txt`](docs/evidence/11_notebook_execution_proof.txt)
+> — the two evidence notebooks were **run on Databricks as jobs**; this file shows,
+> **cell by cell, the code that ran and the output Databricks produced** (pipeline
+> `COMPLETED`, 40 rows/layer, a Romanian transcript → English AI summary + ticket,
+> 100% category accuracy). Captured from the executed notebooks, not hand-written.
+>
 > **Single-file proof:** [`docs/evidence/10_end_to_end_execution.txt`](docs/evidence/10_end_to_end_execution.txt)
 > contains all three, as plain text: **[A]** a committed pipeline run with
 > bronze/silver/gold row counts (40/40/40/40, 100% accuracy), **[B]** a sample
