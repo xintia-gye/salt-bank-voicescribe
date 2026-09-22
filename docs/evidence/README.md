@@ -39,6 +39,11 @@ text/markdown — no Databricks, no notebook viewer needed:
 Each ` (OUTPUT) ` block in those files is the exact result Databricks produced during
 the run (extracted from the executed notebooks), not hand-written.
 
+**Plain `.txt` (outputs only — proof the pipeline & queries ran):**
+
+- [`07_pipeline_run_output.txt`](07_pipeline_run_output.txt) — headed **"PROOF THE PIPELINE RAN"** (job run `221692384572973` → `SUCCESS`; fresh update `356db78f` → `COMPLETED`); each step shows the query/code and the live Databricks output.
+- [`08_medallion_bronze_silver_gold_output.txt`](08_medallion_bronze_silver_gold_output.txt) — headed **"PROOF THE QUERIES RAN"** (job run `153107346629968` → `SUCCESS`); each layer query with its returned rows, plus the `CALL-a82dce985c` bronze→silver→gold trace.
+
 ## Headline results (from the captured files)
 
 - **App health** (file 1): `status: ok`, `db_configured: true`, `lakebase_available: true`, `approvals_store: lakebase`.

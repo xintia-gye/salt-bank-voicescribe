@@ -1,0 +1,128 @@
+================================================================================
+ SALT BANK VOICESCRIBE - PIPELINE RUN EVIDENCE (executed output)
+================================================================================
+
+ PROOF THE PIPELINE RAN:
+   Databricks job run 221692384572973 -> result SUCCESS
+   Workspace: adb-984752964297111 (bolt)
+   The notebook triggered a FRESH pipeline update (356db78f-69f8-459d-85bf-
+   2196143d2ec5) which reached state COMPLETED. Captured 2026-09-22.
+
+ Every OUTPUT block below was produced by Databricks when the notebook ran -
+ extracted from the executed notebook, not hand-written.
+
+==============================================================================
+[1] 1 · Trigger a fresh pipeline run
+------------------------------------------------------------------------------
+QUERY / CODE:
+    from databricks.sdk import WorkspaceClient
+    
+    PIPELINE_ID = "86e45489-d65a-440c-8c40-3831561a7f6a"
+    w = WorkspaceClient()
+    
+    started = w.pipelines.start_update(pipeline_id=PIPELINE_ID)
+    update_id = started.update_id
+    print(f"Started update {update_id} on pipeline {PIPELINE_ID}")
+
+OUTPUT (produced live by Databricks):
+    Started update 356db78f-69f8-459d-85bf-2196143d2ec5 on pipeline 86e45489-d65a-440c-8c40-3831561a7f6a
+
+==============================================================================
+[2] 2 · Wait for the run to complete
+------------------------------------------------------------------------------
+QUERY / CODE:
+    import time
+    
+    TERMINAL = {"COMPLETED", "FAILED", "CANCELED"}
+    state = None
+    for _ in range(60):
+        upd = w.pipelines.get_update(pipeline_id=PIPELINE_ID, update_id=update_id).update
+        state = str(upd.state)
+        print(f"update {update_id[:6]} -> {state}")
+        if any(t in state for t in TERMINAL):
+            break
+        time.sleep(15)
+    
+    assert "COMPLETED" in state, f"Pipeline did not complete cleanly: {state}"
+    print("\n✅ Pipeline completed cleanly.")
+
+OUTPUT (produced live by Databricks):
+    update 356db7 -> UpdateInfoState.CREATED
+    update 356db7 -> UpdateInfoState.WAITING_FOR_RESOURCES
+    update 356db7 -> UpdateInfoState.INITIALIZING
+    update 356db7 -> UpdateInfoState.RUNNING
+    update 356db7 -> UpdateInfoState.RUNNING
+    update 356db7 -> UpdateInfoState.RUNNING
+    update 356db7 -> UpdateInfoState.RUNNING
+    update 356db7 -> UpdateInfoState.COMPLETED
+    
+    ✅ Pipeline completed cleanly.
+
+==============================================================================
+[3] 3 · Verify every medallion layer materialized
+------------------------------------------------------------------------------
+QUERY / CODE:
+    USE CATALOG salt_bank_voicescribe;
+    USE SCHEMA voicescribe_pipeline;
+    
+    SELECT 'bronze_calls'        AS layer_table, count(*) AS rows FROM bronze_calls
+    UNION ALL SELECT 'bronze_transcripts',  count(*) FROM bronze_transcripts
+    UNION ALL SELECT 'silver_transcripts',  count(*) FROM silver_transcripts
+    UNION ALL SELECT 'gold_call_summaries', count(*) FROM gold_call_summaries;
+
+OUTPUT (produced live by Databricks):
+    layer_table         | rows
+    --------------------+-----
+    bronze_calls        | 40  
+    bronze_transcripts  | 40  
+    silver_transcripts  | 40  
+    gold_call_summaries | 40
+
+==============================================================================
+[4] 4 · Gold layer — GenAI summaries the app + Genie read
+------------------------------------------------------------------------------
+QUERY / CODE:
+    SELECT call_id, agent, language, category, sentiment, ticket_id, summary
+    FROM gold_call_summaries
+    ORDER BY started_at
+    LIMIT 3;
+
+OUTPUT (produced live by Databricks):
+    call_id         | agent      | language | category     | sentiment | ticket_id   | summary                                                                                                                                                                                                                                                                 
+    ----------------+------------+----------+--------------+-----------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    CALL-a82dce985c | E. Marin   | ro       | card_lost    | neutral   | SB-00A0C6AD | Customer reported losing their card and requested it be blocked. Agent immediately blocked the card ending in 4471 and arranged for a replacement card to be sent to the customer's home address within 3-5 business days.                                              
+    CALL-00ce224f10 | C. Dumitru | ro       | card_lost    | neutral   | SB-7BE259A7 | Customer reported losing their card and requested it be blocked. Agent successfully blocked the card ending in 4471 and arranged for a replacement card to be sent to the customer's home address within 3-5 business days.                                             
+    CALL-ed7b057e28 | M. Ionescu | en       | loan_inquiry | positive  | SB-0BB04A8B | Customer inquired about qualifying for a 10,000 euro personal loan for home renovation. Agent performed a soft check based on 2,500 monthly income and confirmed likely qualification with an indicative 8.9% APR, sending a pre-offer to the customer's app for review.
+
+==============================================================================
+[5] 5 · Category distribution
+------------------------------------------------------------------------------
+QUERY / CODE:
+    SELECT category, count(*) AS calls
+    FROM gold_call_summaries
+    GROUP BY category
+    ORDER BY calls DESC;
+
+OUTPUT (produced live by Databricks):
+    category        | calls
+    ----------------+------
+    card_lost       | 13   
+    account_closure | 7    
+    loan_inquiry    | 7    
+    fraud_dispute   | 7    
+    app_technical   | 6
+
+==============================================================================
+[6] 6 · Quality check — classification accuracy vs. ground truth
+------------------------------------------------------------------------------
+QUERY / CODE:
+    SELECT
+      round(100.0 * sum(CASE WHEN g.category = b.expected_category THEN 1 ELSE 0 END) / count(*), 1) AS category_accuracy_pct,
+      count(*) AS calls
+    FROM gold_call_summaries g
+    JOIN bronze_calls b USING (call_id);
+
+OUTPUT (produced live by Databricks):
+    category_accuracy_pct | calls
+    ----------------------+------
+    100.0                 | 40
