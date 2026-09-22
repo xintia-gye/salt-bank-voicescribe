@@ -28,6 +28,17 @@ sets, and a run log from the deployed pipeline, app, and agent.
 | 9 | [`notebooks/07_pipeline_run_evidence.executed.ipynb`](../../notebooks/07_pipeline_run_evidence.executed.ipynb) | The **executed notebook with committed output cells** — Databricks job run `221692384572973` (`SUCCESS`); the notebook triggered its own fresh pipeline update `356db78f` → `COMPLETED` and captured the real result tables. Raw Databricks export: [`07_pipeline_run_evidence.executed.html`](07_pipeline_run_evidence.executed.html) |
 | 10 | [`notebooks/08_medallion_bronze_silver_gold.executed.ipynb`](../../notebooks/08_medallion_bronze_silver_gold.executed.ipynb) | The **bronze → silver → gold walkthrough with committed output cells** — Databricks job run `153107346629968` (`SUCCESS`); shows the real data at each layer and traces one call (`CALL-a82dce985c`) from raw metadata → raw/cleaned transcript → structured AI summary + ticket, ending in 100% category accuracy. Raw Databricks export: [`08_medallion_walkthrough.executed.html`](08_medallion_walkthrough.executed.html) |
 
+### Plain-text renderings (read the outputs without opening a notebook)
+
+For reviewers who want to read the executed code **and its real output** as plain
+text/markdown — no Databricks, no notebook viewer needed:
+
+- [`07_pipeline_run_evidence.output.md`](07_pipeline_run_evidence.output.md) — the pipeline-run notebook, code + real output interleaved (fresh update `356db78f` → `COMPLETED`, 40 rows/layer, 100% accuracy).
+- [`08_medallion_bronze_silver_gold.output.md`](08_medallion_bronze_silver_gold.output.md) — the medallion walkthrough, including the **full Romanian → English trace** of `CALL-a82dce985c`: raw transcript (Bronze) → cleaned transcript (Silver) → structured AI summary + ticket (Gold).
+
+Each ` (OUTPUT) ` block in those files is the exact result Databricks produced during
+the run (extracted from the executed notebooks), not hand-written.
+
 ## Headline results (from the captured files)
 
 - **App health** (file 1): `status: ok`, `db_configured: true`, `lakebase_available: true`, `approvals_store: lakebase`.
