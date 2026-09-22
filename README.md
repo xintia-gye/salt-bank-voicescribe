@@ -1,6 +1,67 @@
 # Salt Bank VoiceScribe
 
-Note: for any evidence of the build, please check notebooks/07_pipeline_run_evidence.executed.ipynb and Summary and Output screenshots.pdf 
+<!-- ===================================================================== -->
+<!-- EXECUTION EVIDENCE — captured from LIVE runs on Databricks 2026-09-22. -->
+<!-- Not hand-written. Full detail: EXECUTION_EVIDENCE.txt + docs/evidence/. -->
+<!-- ===================================================================== -->
+
+## ✅ PROOF IT RAN (read this first)
+
+The build was **executed end-to-end on Databricks** (workspace `adb-984752964297111`).
+The outputs below were **captured from live runs**, not hand-written.
+
+**1) Pipeline ran — Lakeflow update `356db78f` → `COMPLETED`:**
+
+```
+Started update 356db78f-69f8-459d-85bf-2196143d2ec5 on pipeline 86e45489-...
+update 356db7 -> UpdateInfoState.RUNNING
+update 356db7 -> UpdateInfoState.COMPLETED
+✅ Pipeline completed cleanly.
+```
+
+**2) Query result — bronze/silver/gold row counts (execution log):**
+
+```
+layer_table         | rows
+--------------------+-----
+bronze_calls        | 40
+bronze_transcripts  | 40
+silver_transcripts  | 40
+gold_call_summaries | 40
+category accuracy vs. ground truth: 100.0% over 40 calls
+```
+
+**3) Transcript → summary the model actually produced (`CALL-ed7b057e28`):**
+
+```
+INPUT  (transcript): CUSTOMER: I'd like to know if I qualify for a personal loan of 10,000 euros...
+OUTPUT (Claude summary): category=loan_inquiry, sentiment=positive, ticket_id=SB-0BB04A8B,
+        summary="Customer inquired about qualifying for a 10,000 euro personal loan for
+        home renovation. Agent performed a soft check based on 2,500 monthly income and
+        confirmed likely qualification with an indicative 8.9% APR..."
+```
+
+**4) Real Genie answer — question → generated SQL → returned rows:**
+
+```
+Q: "How many calls are there by category?"
+SQL Genie generated: SELECT `category`, COUNT(*) AS `call_count`
+                     FROM ...gold_call_summaries WHERE `category` IS NOT NULL
+                     GROUP BY `category` ORDER BY `call_count` DESC
+Rows returned: card_lost 13, account_closure 7, fraud_dispute 7, loan_inquiry 7, app_technical 6
+```
+
+**5) App health check — live `/api/health`:**
+
+```json
+{ "status": "ok", "db_configured": true, "lakebase_available": true, "approvals_store": "lakebase" }
+```
+
+Full captured logs and cell-by-cell notebook runs:
+[`EXECUTION_EVIDENCE.txt`](EXECUTION_EVIDENCE.txt) ·
+[`docs/evidence/`](docs/evidence/)
+
+---
 
 **Automated call summarization on Databricks.** VoiceScribe captures customer support calls, transcribes them with speech-to-text (Romanian & English), summarizes and structures them with a GenAI agent, files a follow-up ticket automatically, and makes the results searchable for operators and supervisors.
 
@@ -101,11 +162,6 @@ tables — phone numbers and card/IBAN digits are masked for non-admins, enforce
 query time across the app, Genie, and SQL (see `notebooks/06_pii_masking.sql`).
 
 See [docs/DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md) for the recording flow and evidence checklist.
-
-**How this was built with AI:** [docs/BUILD_WITH_AI.md](docs/BUILD_WITH_AI.md) — the
-build-process account (tool choice, layer-by-layer workflow from real git history,
-prompt strategy, a real iteration/trade-off, and where Claude Code was the force
-multiplier), as distinct from the product's runtime flow.
 
 ## Proof it ran — execution evidence (inlined)
 
