@@ -1,6 +1,6 @@
 # Salt Bank VoiceScribe
 
-Note: for any evidence of the build, please check docs/evidence/README.md and Summary and Output screenshots.pdf 
+Note: for any evidence of the build, please check notebooks/07_pipeline_run_evidence.executed.ipynb and Summary and Output screenshots.pdf 
 
 **Automated call summarization on Databricks.** VoiceScribe captures customer support calls, transcribes them with speech-to-text (Romanian & English), summarizes and structures them with a GenAI agent, files a follow-up ticket automatically, and makes the results searchable for operators and supervisors.
 
