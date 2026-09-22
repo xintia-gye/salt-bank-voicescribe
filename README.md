@@ -342,4 +342,58 @@ card_lost 13, account_closure 7, fraud_dispute 7, loan_inquiry 7, app_technical 
 
 ---
 
+## How this was built with AI — model, prompt & trade-off decisions
+
+This section narrates the **build process** (the AI-assisted choices behind it), as
+distinct from the product's runtime flow above.
+
+**Tool.** The build was driven with **Claude Code** operating the Databricks workspace
+directly (CLI/MCP): it generated the code *and* executed it against the live workspace —
+creating the Unity Catalog objects, deploying and running the Lakeflow pipeline, querying
+the resulting tables, and capturing the output above. That closed the loop between "write
+code" and "prove it ran" in one tool, which is why the evidence is captured runs rather
+than claims.
+
+**STT model choice (Whisper `whisper-large-v3`).** The calls are bilingual Romanian/
+English, so the deciding requirement was a single model that **auto-detects language**
+rather than a per-language pipeline. Whisper `whisper-large-v3` does this natively, so one
+transcription path handles both RO and EN — see `notebooks/02_speech_to_text.py`. Trade-off
+made explicit in code: the notebook supports **two modes** — a deployed **Model Serving**
+endpoint (production) and an **in-notebook `faster-whisper`** run (used to generate evidence
+without standing up a GPU endpoint). This keeps the demo runnable while leaving the
+production path wired.
+
+**Summarization prompt design.** The Gold step calls Claude via `ai_query` (see the inline
+SQL above). Three deliberate prompt choices:
+1. **Forced strict JSON** with a fixed key set (`summary`, `category`, `sentiment`,
+   `action_items`) so the output parses deterministically into typed columns via
+   `from_json` — no free-text scraping.
+2. **Constrained the category to a closed enum** (`card_lost | fraud_dispute |
+   loan_inquiry | app_technical | account_closure | other`) so classification is
+   measurable against ground truth (hence the **100% category-accuracy** check).
+3. **Forced English output for both RO and EN input**, so supervisors and Genie analytics
+   work in one language regardless of the caller's.
+
+**A real trade-off — durable state vs. resilience.** The operator approval workflow was
+first in-memory; it was then wired to **Lakebase (managed Postgres)** for durable
+persistence. But rather than hard-fail when Lakebase's token isn't available, the code
+**falls back to an in-memory store** so the app degrades gracefully instead of crashing —
+see the token-refresh/fallback logic in `app/backend/lakebase.py`. This is the kind of
+"graduate-to-production without a rewrite" judgment also visible in the ingest-adapter
+design (one interface, `SyntheticAdapter` + `TwilioAdapter`).
+
+**A governance decision.** PII is masked with **Unity Catalog dynamic column masks** keyed
+on `is_account_group_member('admins')` (see inline SQL). The trade-off acknowledged in the
+build: this masks at **query time** (a serving-layer control), so the honest next step for
+real data is redaction/tokenization **at ingest** so raw digits never land in Bronze — the
+current regex (`[0-9]{4,}`) catches numeric PII but not spelled-out numbers or names.
+
+**Iteration that actually happened.** The pipeline's first run **failed** — the Lakeflow
+notebook library paths were wrong (missing `.sql` suffix); the paths were corrected and the
+re-run reached `COMPLETED` (the captured update `356db78f` above). The build was done
+**layer by layer** (bronze→silver→gold, then app, then governance), each a runnable
+increment — verifiable in the commit history (`git log --reverse`).
+
+---
+
 *Salt Bank is a digital bank; this is a field-engineering demonstration built on synthetic data.*
