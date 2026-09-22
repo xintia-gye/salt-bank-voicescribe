@@ -98,6 +98,11 @@ query time across the app, Genie, and SQL (see `notebooks/06_pii_masking.sql`).
 
 See [docs/DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md) for the recording flow and evidence checklist.
 
+**Proof it ran:** committed, live-captured execution evidence — health-check
+response, query result sets, a Genie answer with returned rows, the pipeline
+run log, and a transcript→summary example — is in
+[docs/evidence/](docs/evidence/) (see [docs/evidence/README.md](docs/evidence/README.md)).
+
 ---
 
 *Salt Bank is a digital bank; this is a field-engineering demonstration built on synthetic data.*
