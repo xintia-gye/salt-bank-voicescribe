@@ -1,0 +1,21 @@
+# App REST API — live responses (captured 2026-09-22)
+# Base: https://voicescribe-984752964297111.11.azure.databricksapps.com
+
+## GET /api/calls?category=fraud_dispute  (first row)
+{
+  "call_id": "CALL-308d36367e",
+  "agent": "L. Nagy",
+  "language": "en",
+  "started_at": "2026-09-19T05:30:00-04:00",
+  "duration_seconds": 214,
+  "summary": "Customer reported two unauthorized transactions of 120 euros each to an unknown website. Agent opened a fraud dispute, blocked the card, and informed customer of provisional credit within 2 days and final decision within 10 days.",
+  "category": "fraud_dispute",
+  "sentiment": "neutral",
+  "ticket_id": "SB-98C0C228",
+  "llm_model": "databricks-claude-sonnet-4-5",
+  "summarized_at": "2026-09-20T14:56:01.083608-04:00",
+  "approval_status": "approved",
+  "edited_summary": null,
+  "approved_by": "operator",
+  "approved_at": "2026-09-22T10:11:31.546307+00:00"
+}
