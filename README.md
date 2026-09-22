@@ -69,6 +69,82 @@ It replaces a manual process where every operator hand-wrote a call summary afte
 
 > **Data notice:** This repository ships with **synthetic data only** (text-to-speech generated call recordings and fabricated metadata in Romanian and English). No real customer, audio, or PII data is included. Twilio and Databricks secrets are kept out of the repository (see `.gitignore` and `.env.example`).
 
+## Key code — inline (transformation, governance, data generation)
+
+The full sources live in `pipelines/`, `notebooks/`, and `data/`; the core logic is
+shown here so it is visible without traversing the tree.
+
+### Medallion build logic — Bronze (Auto Loader streaming ingest)
+`pipelines/voicescribe_pipeline/src/transformations/01_bronze_calls.sql`
+```sql
+CREATE OR REFRESH STREAMING TABLE bronze_calls
+COMMENT 'Bronze: raw call metadata as landed by the ingest adapter (Auto Loader)'
+CLUSTER BY (language) AS
+SELECT call_id, agent, from_number, to_number, language,
+       CAST(duration_seconds AS INT) AS duration_seconds,
+       CAST(started_at AS TIMESTAMP) AS started_at,
+       recording_uri, source, expected_category, expected_sentiment,
+       current_timestamp() AS ingested_at, _metadata.file_path AS _source_file
+FROM STREAM read_files('${landing_volume}/calls/', format => 'json', schemaHints => '...');
+```
+
+### Data-quality check — Silver (validated, deduped one row per call)
+`pipelines/voicescribe_pipeline/src/transformations/03_silver_transcripts.sql`
+```sql
+CREATE OR REFRESH MATERIALIZED VIEW silver_transcripts
+COMMENT 'Silver: validated speech-to-text transcripts, one row per call' AS
+SELECT t.call_id, c.language, t.transcript, 'whisper-large-v3' AS stt_model,
+       current_timestamp() AS transcribed_at
+FROM bronze_transcripts t
+LEFT JOIN bronze_calls c USING (call_id)
+WHERE t.transcript IS NOT NULL AND length(trim(t.transcript)) > 0;   -- DQ: non-empty transcript
+```
+
+### GenAI transformation — Gold (`ai_query` + auto-filed ticket)
+`pipelines/voicescribe_pipeline/src/transformations/04_gold_call_summaries.sql`
+```sql
+CREATE OR REFRESH MATERIALIZED VIEW gold_call_summaries CLUSTER BY (category) AS
+WITH scored AS (
+  SELECT s.call_id, c.agent, s.language, c.started_at, c.duration_seconds,
+    ai_query('${llm_endpoint}',
+      concat('You are VoiceScribe for Salt Bank. Summarize this support call ',
+             'transcript (Romanian or English). Respond ONLY with a JSON object with keys: ',
+             'summary, category (card_lost|fraud_dispute|loan_inquiry|app_technical|',
+             'account_closure|other), sentiment (positive|neutral|negative), action_items. ',
+             'Transcript: ', s.transcript)) AS js
+  FROM silver_transcripts s LEFT JOIN bronze_calls c USING (call_id))
+-- ...from_json(...) into typed columns, then create_ticket(call_id, category) AS ticket_id
+```
+
+### Governance — Unity Catalog PII masking rules
+`notebooks/06_pii_masking.sql`
+```sql
+-- Free text: redact runs of 4+ digits (card numbers, IBAN/account digits)
+CREATE OR REPLACE FUNCTION redact_pii_text(t STRING) RETURNS STRING RETURN CASE
+  WHEN is_account_group_member('admins') THEN t          -- admins see full data
+  WHEN t IS NULL THEN NULL
+  ELSE regexp_replace(t, '[0-9]{4,}', '[REDACTED]') END;  -- everyone else: masked
+-- Phone: reveal only country code + last 2 digits, e.g. +40*******63
+ALTER TABLE silver_transcripts ALTER COLUMN transcript SET MASK redact_pii_text;
+ALTER TABLE gold_call_summaries ALTER COLUMN summary    SET MASK redact_pii_text;
+```
+
+### Data generation — realistic weighted distributions (not uniform filler)
+`data/generate_synthetic_calls.py`
+```python
+CATEGORY_WEIGHTS = {"card_lost": 0.325, "fraud_dispute": 0.175, "loan_inquiry": 0.175,
+                    "account_closure": 0.175, "app_technical": 0.150}  # card_lost dominates
+LANGUAGE_WEIGHTS = {"ro": 0.70, "en": 0.30}                # RO bank, EN minority
+CATEGORY_DURATION = {"card_lost": (150,60), "fraud_dispute": (300,90),  # fraud/loan run longer
+                     "loan_inquiry": (300,80), "account_closure": (220,70), "app_technical": (180,60)}
+category = weighted_choice(CATEGORY_WEIGHTS)   # not random.choice — shaped mix
+lang     = weighted_choice(LANGUAGE_WEIGHTS)
+duration = max(60, min(600, int(random.gauss(*CATEGORY_DURATION[category]))))  # per-category spread
+```
+Realized on the committed 40-call set: category `card_lost 13, fraud/loan/closure 7 each,
+app_technical 6`; language `ro 28 / en 12`; sentiment skews neutral/negative over positive.
+Edge cases covered: bilingual RO/EN, empty-transcript rows dropped at Silver, duration clamp 60–600s.
+
 ## Architecture — the six layers
 
 | # | Layer | Role in VoiceScribe |
