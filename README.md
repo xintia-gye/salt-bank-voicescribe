@@ -46,7 +46,9 @@ Twilio Voice (or synthetic recording)
 salt-bank-voicescribe/
 ├── README.md                 # this file
 ├── .env.example              # config template (no secrets committed)
-├── data/synthetic/           # synthetic RO/EN call recordings + metadata
+├── data/
+│   ├── generate_synthetic_calls.py  # synthetic-data generator (weighted, non-uniform distributions)
+│   └── synthetic/            # generated RO/EN transcripts + metadata (see its README for distributions)
 ├── notebooks/                # committed notebooks with outputs (evidence)
 ├── pipelines/voicescribe_pipeline/  # Lakeflow Declarative Pipeline (Databricks Asset Bundle)
 │   ├── databricks.yml               #   bundle config (dev/prod targets)
@@ -100,10 +102,91 @@ query time across the app, Genie, and SQL (see `notebooks/06_pii_masking.sql`).
 
 See [docs/DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md) for the recording flow and evidence checklist.
 
-**Proof it ran:** committed, live-captured execution evidence — health-check
-response, query result sets, a Genie answer with returned rows, the pipeline
-run log, and a transcript→summary example — is in
-[docs/evidence/](docs/evidence/) (see [docs/evidence/README.md](docs/evidence/README.md)).
+## Proof it ran — execution evidence (inlined)
+
+The build was **executed end-to-end on Databricks**. The outputs below are captured
+**live** from those runs (not hand-written). Full artifacts — executed notebooks with
+output cells, raw run logs, JSON result sets — are in
+[docs/evidence/](docs/evidence/) (index: [docs/evidence/README.md](docs/evidence/README.md)),
+with plain-text renderings in
+[`07_pipeline_run_output.txt`](docs/evidence/07_pipeline_run_output.txt) and
+[`08_medallion_bronze_silver_gold_output.txt`](docs/evidence/08_medallion_bronze_silver_gold_output.txt).
+
+### 1 · The pipeline ran — fresh run trace (Databricks job run `221692384572973` → `SUCCESS`)
+
+The evidence notebook triggered a fresh Lakeflow pipeline update and it completed cleanly:
+
+```text
+Started update 356db78f-69f8-459d-85bf-2196143d2ec5 on pipeline 86e45489-d65a-440c-8c40-3831561a7f6a
+update 356db7 -> UpdateInfoState.CREATED
+update 356db7 -> UpdateInfoState.WAITING_FOR_RESOURCES
+update 356db7 -> UpdateInfoState.INITIALIZING
+update 356db7 -> UpdateInfoState.RUNNING
+update 356db7 -> UpdateInfoState.COMPLETED
+
+✅ Pipeline completed cleanly.
+```
+
+### 2 · Query output — every medallion layer materialized (40 rows each)
+
+```sql
+SELECT 'bronze_calls' AS layer_table, count(*) FROM bronze_calls
+UNION ALL SELECT 'bronze_transcripts', count(*) FROM bronze_transcripts
+UNION ALL SELECT 'silver_transcripts', count(*) FROM silver_transcripts
+UNION ALL SELECT 'gold_call_summaries', count(*) FROM gold_call_summaries;
+```
+```text
+layer_table         | rows
+--------------------+-----
+bronze_calls        | 40
+bronze_transcripts  | 40
+silver_transcripts  | 40
+gold_call_summaries | 40
+```
+
+### 3 · One call, Bronze → Silver → Gold (`CALL-a82dce985c`)
+
+**Bronze — raw Romanian transcript** (`SELECT ... FROM bronze_transcripts WHERE call_id='CALL-a82dce985c'`):
+```text
+AGENT: Salt Bank, bună ziua, cu ce vă pot ajuta?
+CUSTOMER: Bună, mi-am pierdut cardul ieri și vreau să îl blochez.
+AGENT: Cardul care se termină în 4471 este acum blocat. Doriți un card nou?
+CUSTOMER: Da, vă rog, la adresa de domiciliu.
+```
+**Gold — structured GenAI summary + auto-filed ticket** (`SELECT ... FROM gold_call_summaries WHERE call_id='CALL-a82dce985c'`):
+```text
+call_id         | category  | sentiment | ticket_id   | llm_model                    | summary
+----------------+-----------+-----------+-------------+------------------------------+------------------------------------------------------------
+CALL-a82dce985c | card_lost | neutral   | SB-00A0C6AD | databricks-claude-sonnet-4-5 | Customer reported losing their card and requested it be
+                |           |           |             |                              | blocked. Agent blocked the card ending 4471 and arranged a
+                |           |           |             |                              | replacement to the home address within 3-5 business days.
+```
+
+### 4 · GenAI classification accuracy vs. ground truth
+
+```sql
+SELECT round(100.0*sum(CASE WHEN g.category=b.expected_category THEN 1 ELSE 0 END)/count(*),1) AS accuracy_pct,
+       count(*) AS calls
+FROM gold_call_summaries g JOIN bronze_calls b USING (call_id);
+```
+```text
+accuracy_pct | calls
+-------------+------
+100.0        | 40
+```
+
+### 5 · Genie answered a natural-language question ([`03_genie_answer.json`](docs/evidence/03_genie_answer.json))
+
+Question: *"How many calls are there by category?"* → Genie generated governed SQL and returned:
+```text
+card_lost 13, account_closure 7, fraud_dispute 7, loan_inquiry 7, app_technical 6
+```
+
+### 6 · App health check — live `/api/health` ([`01_health_check.json`](docs/evidence/01_health_check.json))
+
+```json
+{ "status": "ok", "db_configured": true, "lakebase_available": true, "approvals_store": "lakebase" }
+```
 
 ---
 

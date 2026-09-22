@@ -150,6 +150,42 @@ NAMES = ["Ana M.", "Radu P.", "Ioana T.", "Mihai D.", "Elena S.", "George V.", "
 SENTIMENTS = {"card_lost": "neutral", "fraud_dispute": "negative", "loan_inquiry": "positive",
               "app_technical": "neutral", "account_closure": "negative"}
 
+# --- Realistic distributions (NOT uniform filler) ---------------------------
+# Weights are chosen to reflect a real Romanian retail-bank support line, and
+# they match the shape of the committed 40-call dataset in ./synthetic/.
+#
+# Category mix — lost/stolen cards dominate a card-issuer support line, tech and
+# closures are rarer:
+CATEGORY_WEIGHTS = {
+    "card_lost":       0.325,   # most common contact reason
+    "fraud_dispute":   0.175,
+    "loan_inquiry":    0.175,
+    "account_closure": 0.175,
+    "app_technical":   0.150,   # least common
+}
+# Language balance — Salt Bank is a Romanian bank, so calls skew Romanian, with
+# a meaningful English minority (expats / non-native speakers):
+LANGUAGE_WEIGHTS = {"ro": 0.70, "en": 0.30}
+# Sentiment is a deterministic property of the scenario (see SENTIMENTS), which
+# yields a realistic skew: mostly neutral/negative with fewer clearly-positive
+# calls — people rarely phone support when everything is fine.
+#
+# Call duration varies by category — fraud and loans run longer than a quick
+# card block or login fix (mean seconds, lognormal-ish via gauss, clamped):
+CATEGORY_DURATION = {
+    "card_lost":       (150, 60),
+    "fraud_dispute":   (300, 90),
+    "loan_inquiry":    (300, 80),
+    "account_closure": (220, 70),
+    "app_technical":   (180, 60),
+}
+
+
+def weighted_choice(weights: dict[str, float]) -> str:
+    """Sample one key from a {value: weight} mapping."""
+    keys = list(weights)
+    return random.choices(keys, weights=[weights[k] for k in keys], k=1)[0]
+
 
 def render_transcript(category: str, lang: str) -> str:
     en, ro = SCENARIOS[category]
@@ -180,16 +216,23 @@ def main():
         except Exception as e:  # pragma: no cover
             print(f"[warn] pyttsx3 unavailable ({e}); writing transcripts only.")
 
-    categories = list(SCENARIOS.keys())
     base_time = datetime(2026, 9, 1, 9, 0, 0)
     meta_path = OUT / "calls_metadata.jsonl"
+
+    from collections import Counter
+    cat_counts: Counter[str] = Counter()
+    lang_counts: Counter[str] = Counter()
+    sent_counts: Counter[str] = Counter()
 
     with meta_path.open("w", encoding="utf-8") as mf:
         for i in range(args.n):
             call_id = f"CALL-{uuid.uuid4().hex[:10]}"
-            category = random.choice(categories)
-            lang = random.choice(["ro", "en"])
-            duration = random.randint(90, 480)
+            # Weighted sampling → realistic category mix & language balance
+            # (not uniform random.choice), with sentiment derived per scenario.
+            category = weighted_choice(CATEGORY_WEIGHTS)
+            lang = weighted_choice(LANGUAGE_WEIGHTS)
+            mu, sigma = CATEGORY_DURATION[category]
+            duration = max(60, min(600, int(random.gauss(mu, sigma))))
             ts = base_time + timedelta(minutes=random.randint(0, 20 * 24 * 60))
             transcript = render_transcript(category, lang)
             (TRANSCRIPTS / f"{call_id}.txt").write_text(transcript, encoding="utf-8")
@@ -208,6 +251,9 @@ def main():
                 "source": "synthetic",
             }
             mf.write(json.dumps(row, ensure_ascii=False) + "\n")
+            cat_counts[category] += 1
+            lang_counts[lang] += 1
+            sent_counts[SENTIMENTS[category]] += 1
 
             if tts is not None:
                 wav = OUT / "audio" / f"{call_id}.wav"
@@ -218,6 +264,14 @@ def main():
 
     print(f"Wrote {args.n} synthetic calls → {meta_path}")
     print(f"Transcripts → {TRANSCRIPTS}")
+    # Print realized distributions so the shaping is visible, not assumed.
+    def _pct(counter):
+        return ", ".join(f"{k} {v} ({v/args.n:.0%})"
+                         for k, v in sorted(counter.items(), key=lambda x: -x[1]))
+    print("\nRealized distributions (should reflect the weighted, non-uniform config):")
+    print(f"  category : {_pct(cat_counts)}")
+    print(f"  language : {_pct(lang_counts)}")
+    print(f"  sentiment: {_pct(sent_counts)}")
 
 
 if __name__ == "__main__":
