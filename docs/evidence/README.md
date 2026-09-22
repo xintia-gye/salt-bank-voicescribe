@@ -15,6 +15,7 @@ sets, and a run log from the deployed pipeline, app, and agent.
 | 5 | [`05_transcript_to_summary.json`](05_transcript_to_summary.json) | The **GenAI agent executed** — one real transcript → AI summary + action items + ticket (with PII masked live) |
 | 6 | [`06_app_api_responses.txt`](06_app_api_responses.txt) | The **app serves real data** — live `/api/calls` response incl. a Lakebase-persisted approval |
 | 7 | [`07_pipeline_rerun_log.txt`](07_pipeline_rerun_log.txt) | The **pipeline re-ran clean today** — full flow log for a freshly triggered update (`acd511`), all flows `COMPLETED`, + post-run layer counts/accuracy. Reproduce it with [`notebooks/07_pipeline_run_evidence.py`](../../notebooks/07_pipeline_run_evidence.py) |
+| 8 | [`07_pipeline_run_outcome.md`](07_pipeline_run_outcome.md) | The **rendered notebook outcome** — every step of [`notebooks/07_pipeline_run_evidence.py`](../../notebooks/07_pipeline_run_evidence.py) with its output, viewable without opening Databricks |
 
 ## Headline results (from the captured files)
 
